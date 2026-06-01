@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>K-Public</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0369a1">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;color:#111827;background:#f8f9fa;-webkit-font-smoothing:antialiased;overflow:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
+:root{
+  --sky:#0369a1;--sky-dk:#075985;--sky-bg:#f0f9ff;--sky-bd:#bae6fd;
+  --green:#16a34a;--green-bg:#f0fdf4;
+  --orange:#ea580c;--orange-bg:#fff7ed;
+  --danger:#ef4444;--danger-bg:#fef2f2;
+  --border:#e5e7eb;--txt2:#4b5563;--txt3:#6b7280;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+.app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;background:#f8f9fa}
+
+/* 상단 바 */
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:10}
+.topbar-logo{display:flex;align-items:center;gap:8px}
+.topbar-mark{width:30px;height:30px;background:var(--sky);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.topbar-mark svg{width:14px;height:14px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.topbar-name{font-size:16px;font-weight:800;color:#111}
+.topbar-right{margin-left:auto;display:flex;gap:6px}
+.tb-btn-sky{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;background:var(--sky);color:#fff}
+.tb-btn-orange{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;background:var(--orange-bg);color:var(--orange);border:1.5px solid #fed7aa}
+
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen{display:none;animation:fadeIn .2s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* 홈 히어로 */
+.home-hero{background:linear-gradient(135deg,var(--sky-dk) 0%,#1e40af 100%);padding:20px 16px;color:#fff}
+.home-hero-title{font-size:18px;font-weight:800;margin-bottom:4px}
+.home-hero-sub{font-size:13px;opacity:.8}
+.hero-stats-row{display:flex;gap:10px;margin-top:14px}
+.hstat-mini{flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center}
+.hsm-val{font-size:16px;font-weight:800;line-height:1.1}
+.hsm-lbl{font-size:10px;opacity:.7;margin-top:2px}
+
+/* 카테고리 그리드 */
+.section-label{font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;padding:16px 16px 8px}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
+.cat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .15s}
+.cat-card:active{border-color:var(--sky);background:var(--sky-bg)}
+.cat-icon{font-size:22px;display:block;margin-bottom:4px}
+.cat-label{font-size:11px;font-weight:700;color:#111}
+.cat-sub{font-size:10px;color:var(--txt3);margin-top:2px}
+
+/* 진행 민원 */
+.civil-card{margin:0 16px 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
+.civil-title{font-size:14px;font-weight:700;color:#111;margin-bottom:3px}
+.civil-detail{font-size:12px;color:var(--txt3);margin-bottom:8px}
+.progress-bar{background:#e5e7eb;border-radius:8px;height:6px;overflow:hidden}
+.progress-fill{height:100%;background:var(--sky);border-radius:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px}
+.b-ok{background:var(--green-bg);color:#065f46}
+.b-wait{background:var(--orange-bg);color:#9a3412}
+.b-done{background:#f1f5f9;color:#475569}
+.b-proc{background:#faf5ff;color:#6d28d9}
+.b-sky{background:var(--sky-bg);color:var(--sky-dk)}
+
+/* 채팅 */
+.chat-screen{display:none;flex-direction:column;height:100%}
+.chat-screen.active{display:flex}
+.chat-header{background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sky),#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-avatar svg{width:16px;height:16px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.chat-header-name{font-size:14px;font-weight:700}
+.chat-header-status{font-size:11px;color:var(--sky-dk);font-weight:500;display:flex;align-items:center;gap:4px}
+.chat-header-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--sky);display:inline-block}
+.chat-back{padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#374151;background:#f3f4f6;border:none;cursor:pointer}
+.chat-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#f8f9fa}
+.b-ai{max-width:88%;align-self:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:14px;line-height:1.7;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.b-user{max-width:88%;align-self:flex-end;background:var(--sky);color:#fff;border-radius:14px 14px 4px 14px;padding:10px 13px;font-size:14px;line-height:1.7}
+.quick-row{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}
+.qb{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:5px 11px;font-size:12px;font-weight:600;color:#374151;cursor:pointer}
+.qb:active{background:var(--sky-bg);border-color:var(--sky);color:var(--sky-dk)}
+.chat-input-area{background:#fff;border-top:1px solid var(--border);padding:10px 12px;padding-bottom:calc(10px + var(--safe-b));display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.chat-textarea{flex:1;background:#f3f4f6;border:1px solid var(--border);border-radius:20px;padding:9px 14px;font-family:'Inter',sans-serif;font-size:14px;resize:none;outline:none;max-height:100px;transition:border-color .15s}
+.chat-textarea:focus{border-color:var(--sky);background:#fff}
+.chat-send-btn{width:38px;height:38px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:none;cursor:pointer}
+.chat-send-btn:disabled{background:var(--sky-bd)}
+.chat-send-btn svg{width:16px;height:16px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* 탭 바 */
+.tab-bar{background:#fff;border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-b);flex-shrink:0;z-index:10}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;cursor:pointer;font-size:9px;font-weight:600;color:var(--txt3);background:none;border:none;transition:color .15s}
+.tab-item.active{color:var(--sky-dk)}
+.tab-icon{font-size:20px;line-height:1}
+
+/* 지역 정보 */
+.info-card{margin:0 16px 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
+.info-title{font-size:13px;font-weight:700;color:#111;margin-bottom:4px}
+.info-detail{font-size:12px;color:var(--txt3)}
+.info-amount{font-size:14px;font-weight:800;color:var(--sky-dk);margin-top:4px}
+
+/* 폼 */
+.input-card{margin:0 16px 12px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px}
+.f-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
+.f-input{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:14px;outline:none;margin-bottom:10px}
+.f-input:focus{border-color:var(--sky)}
+.f-btn{width:100%;padding:12px;border-radius:9px;background:var(--sky);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer}
+
+/* 신고 화면 */
+.report-card{margin:0 16px 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
+.rc-title{font-size:14px;font-weight:700;color:#111;margin-bottom:3px}
+.rc-detail{font-size:12px;color:var(--txt3);margin-bottom:8px}
+
+/* 토스트 */
+.toast{position:fixed;top:70px;left:16px;right:16px;background:#111;color:#fff;border-radius:10px;padding:12px 16px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(-10px);transition:all .25s}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-mark"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg></div>
+      <span class="topbar-name">K-Public</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn-orange" onclick="showScreen('report')">📣 신고</button>
+      <button class="tb-btn-sky" onclick="showChatScreen()">AI 공무원</button>
+    </div>
+  </div>
+
+  <div class="content" id="content-area">
+
+    <!-- 홈 -->
+    <div class="screen active" id="screen-home">
+      <div class="home-hero">
+        <div class="home-hero-title">안녕하세요! AI 공무원입니다 🏛️</div>
+        <div class="home-hero-sub">말 한 마디로 모든 행정 업무를 처리합니다</div>
+        <div class="hero-stats-row">
+          <div class="hstat-mini"><div class="hsm-val">24h</div><div class="hsm-lbl">365일 운영</div></div>
+          <div class="hstat-mini"><div class="hsm-val">대기 0</div><div class="hsm-lbl">즉시 처리</div></div>
+          <div class="hstat-mini"><div class="hsm-val">PDV</div><div class="hsm-lbl">투명 기록</div></div>
+        </div>
+      </div>
+
+      <div class="section-label">🏛️ 자주 쓰는 민원</div>
+      <div class="cat-grid">
+        <div class="cat-card" onclick="qs('주민등록등본 발급해 줘')"><span class="cat-icon">📋</span><div class="cat-label">등본 발급</div><div class="cat-sub">즉시</div></div>
+        <div class="cat-card" onclick="qs('식품 영업 허가 신청해 줘')"><span class="cat-icon">🍽️</span><div class="cat-label">영업 허가</div><div class="cat-sub">신청 대행</div></div>
+        <div class="cat-card" onclick="qs('우리 동네 공공 사업 예산 알려줘')"><span class="cat-icon">📊</span><div class="cat-label">지역 예산</div><div class="cat-sub">실시간</div></div>
+        <div class="cat-card" onclick="qs('도로 파손 신고해 줘')"><span class="cat-icon">🚧</span><div class="cat-label">도로 신고</div><div class="cat-sub">즉시 접수</div></div>
+        <div class="cat-card" onclick="qs('받을 수 있는 복지 지원금 알려줘')"><span class="cat-icon">💰</span><div class="cat-label">복지 안내</div><div class="cat-sub">맞춤 탐색</div></div>
+        <div class="cat-card" onclick="qs('자동차세 납부 조회해 줘')"><span class="cat-icon">💳</span><div class="cat-label">세금 조회</div><div class="cat-sub">조회 대행</div></div>
+      </div>
+
+      <div class="section-label">🔄 진행 중인 민원</div>
+      <div class="civil-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="civil-title">식품 영업 허가 신청</div>
+          <span class="badge b-proc">심사 중</span>
+        </div>
+        <div class="civil-detail">제주시 위생과 · 2026.05.20 신청</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px">70% 완료 · 예상 완료: 2026.06.05</div>
+      </div>
+      <div class="civil-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="civil-title">귀덕리 상수도 누수 신고</div>
+          <span class="badge b-wait">진행 중</span>
+        </div>
+        <div class="civil-detail">제주시 상하수도사업소 · 2026.05.31 신고</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px">현장 조사 중 · 예상 완료: 2026.06.03</div>
+      </div>
+      <div style="padding-bottom:16px"></div>
+    </div>
+
+    <!-- 지역 정보 -->
+    <div class="screen" id="screen-localinfo">
+      <div class="section-label">📊 우리 동네 공공 정보</div>
+      <div class="input-card">
+        <label class="f-label">지역 (읍면동)</label>
+        <input class="f-input" placeholder="예: 제주시 한림읍" id="mob-area">
+        <button class="f-btn" onclick="mobSearchLocal()">조회하기</button>
+      </div>
+      <div class="section-label">📌 제주시 한림읍 2026년 공공 사업</div>
+      <div class="info-card">
+        <div class="info-title">🚧 한림로 도로 재포장</div>
+        <div class="info-detail">제주시 도로관리과 · 2026.04–07</div>
+        <div class="info-amount">예산: 4.2억 원</div>
+        <div style="margin-top:6px"><span class="badge b-proc">진행 중</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-title">🌳 한림 공원 가로수 정비</div>
+        <div class="info-detail">제주시 공원녹지과 · 2026.05–06</div>
+        <div class="info-amount">예산: 8,500만 원</div>
+        <div style="margin-top:6px"><span class="badge b-ok">완료</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-title">💧 귀덕리 상수도 교체</div>
+        <div class="info-detail">제주시 상하수도사업소 · 2026.07–09</div>
+        <div class="info-amount">예산: 1.8억 원</div>
+        <div style="margin-top:6px"><span class="badge b-wait">예정</span></div>
+      </div>
+      <div style="padding-bottom:16px"></div>
+    </div>
+
+    <!-- 신고 -->
+    <div class="screen" id="screen-report">
+      <div class="section-label">📣 공공 시설 신고</div>
+      <div class="cat-grid" style="margin-bottom:16px">
+        <div class="cat-card" onclick="qs('도로 파손 신고해 줘')"><span class="cat-icon">🚧</span><div class="cat-label">도로 파손</div></div>
+        <div class="cat-card" onclick="qs('상하수도 누수 신고해 줘')"><span class="cat-icon">💧</span><div class="cat-label">상하수도</div></div>
+        <div class="cat-card" onclick="qs('가로등 고장 신고해 줘')"><span class="cat-icon">💡</span><div class="cat-label">가로등</div></div>
+        <div class="cat-card" onclick="qs('불법 주정차 신고해 줘')"><span class="cat-icon">🚗</span><div class="cat-label">불법 주정차</div></div>
+        <div class="cat-card" onclick="qs('쓰레기 불법 투기 신고해 줘')"><span class="cat-icon">🗑️</span><div class="cat-label">불법 투기</div></div>
+        <div class="cat-card" onclick="qs('소음 민원 신고해 줘')"><span class="cat-icon">📢</span><div class="cat-label">소음·악취</div></div>
+      </div>
+      <div class="section-label">📍 내 신고 현황</div>
+      <div class="report-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="rc-title">한림로 234 도로 파손</div>
+          <span class="badge b-ok">완료</span>
+        </div>
+        <div class="rc-detail">제주시 도로관리과 · 2026.05.29 신고 · 2026.05.31 완료</div>
+      </div>
+      <div class="report-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="rc-title">귀덕리 상수도 누수</div>
+          <span class="badge b-wait">진행 중</span>
+        </div>
+        <div class="rc-detail">제주시 상하수도사업소 · 2026.05.31 신고 · 현장 조사 중</div>
+        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:40%"></div></div>
+      </div>
+      <div style="padding-bottom:16px"></div>
+    </div>
+
+    <!-- 행정 기록 -->
+    <div class="screen" id="screen-history">
+      <div class="section-label">🔐 행정 처리 기록 (PDV 저장)</div>
+      <div class="civil-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+          <div class="civil-title">주민등록등본 발급</div>
+          <span class="badge b-ok">완료</span>
+        </div>
+        <div class="civil-detail">2026.05.31 · 정부24 · 금융 기관 제출용</div>
+      </div>
+      <div class="civil-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+          <div class="civil-title">식품 영업 허가 신청</div>
+          <span class="badge b-proc">심사 중</span>
+        </div>
+        <div class="civil-detail">2026.05.20 · 제주시 위생과</div>
+      </div>
+      <div class="civil-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+          <div class="civil-title">납세증명서 발급</div>
+          <span class="badge b-ok">완료</span>
+        </div>
+        <div class="civil-detail">2026.05.15 · 국세청 · 입찰 서류</div>
+      </div>
+      <div style="padding-bottom:16px"></div>
+    </div>
+
+  </div>
+
+  <!-- AI 공무원 채팅 -->
+  <div class="chat-screen" id="chat-screen">
+    <div class="chat-header">
+      <button class="chat-back" onclick="hideChatScreen()">← 닫기</button>
+      <div class="chat-avatar"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg></div>
+      <div>
+        <div class="chat-header-name">K-Public AI 공무원</div>
+        <div class="chat-header-status">24시간 응답 · PDV 연동</div>
+      </div>
+    </div>
+    <div class="chat-body" id="mob-chat-body">
+      <div class="b-ai">안녕하세요! K-Public AI 공무원입니다. 🏛️<br><br>등본 발급, 허가 신청, 시설 신고, 복지 안내, 지역 예산 조회 — 어떤 행정 업무든 말씀해 주세요. 대신 처리합니다.<br><br><em style="font-size:12px;color:var(--txt3)">※ 모든 처리 결과는 PDV에 저장됩니다</em></div>
+      <div class="quick-row">
+        <button class="qb" onclick="qs('등본 발급해 줘')">📋 등본</button>
+        <button class="qb" onclick="qs('영업 허가 신청해 줘')">🍽️ 허가</button>
+        <button class="qb" onclick="qs('우리 동네 예산 알려줘')">📊 예산</button>
+        <button class="qb" onclick="qs('도로 파손 신고해 줘')">🚧 신고</button>
+        <button class="qb" onclick="qs('복지 지원금 알려줘')">💰 복지</button>
+        <button class="qb" onclick="qs('세금 조회해 줘')">💳 세금</button>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <textarea class="chat-textarea" id="mob-input" rows="1"
+        placeholder="행정 업무를 말씀해 주세요…"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();mobSend()}"></textarea>
+      <button class="chat-send-btn" id="mob-send-btn" onclick="mobSend()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="tab-bar" id="tab-bar">
+    <button class="tab-item active" onclick="showScreen('home',this)"><div class="tab-icon">🏠</div>홈</button>
+    <button class="tab-item" onclick="showChatScreen()"><div class="tab-icon">🏛️</div>AI공무원</button>
+    <button class="tab-item" onclick="showScreen('localinfo',this)"><div class="tab-icon">📊</div>지역정보</button>
+    <button class="tab-item" onclick="showScreen('report',this)"><div class="tab-icon">📣</div>신고</button>
+    <button class="tab-item" onclick="showScreen('history',this)"><div class="tab-icon">🔐</div>기록</button>
+  </div>
+</div>
+
+<div class="toast" id="mob-toast"></div>
+
+<script>
+const SYS=`당신은 K-Public AI 공무원입니다. 고팡 생태계 공공 행정 서비스에서 운영됩니다.
+시민의 행정 요청을 분석하고, 담당 기관·절차·필요 서류를 안내하며 대행 처리합니다.
+웹 검색으로 최신 법령·조례를 실시간 확인합니다.
+모바일 환경에 맞게 짧고 명확하게, 다음 단계를 항상 안내합니다.`;
+
+let hist=[];
+function showScreen(id,tabEl){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const s=document.getElementById('screen-'+id);if(s)s.classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  if(tabEl)tabEl.classList.add('active');
+  document.getElementById('content-area').scrollTop=0;
+  document.getElementById('chat-screen').classList.remove('active');
+  document.getElementById('tab-bar').style.display='flex';
+}
+function showChatScreen(){
+  document.getElementById('chat-screen').classList.add('active');
+  document.getElementById('tab-bar').style.display='none';
+  document.getElementById('mob-input').focus();
+}
+function hideChatScreen(){
+  document.getElementById('chat-screen').classList.remove('active');
+  document.getElementById('tab-bar').style.display='flex';
+}
+function mobSearchLocal(){
+  const area=document.getElementById('mob-area').value.trim();
+  toast(`📊 ${area||'우리 동네'} 공공 정보를 조회합니다…`);
+}
+async function mobSend(){
+  const inp=document.getElementById('mob-input');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';inp.style.height='auto';
+  addMob(msg,'user');hist.push({role:'user',content:msg});
+  const btn=document.getElementById('mob-send-btn');btn.disabled=true;
+  const tid=addMob('…','ai');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:hist.slice(-8)})});
+    const d=await r.json();
+    const txt=d.content?.find(c=>c.type==='text')?.text||'잠시 후 다시 시도해 주세요.';
+    document.getElementById(tid)?.remove();addMob(txt,'ai');hist.push({role:'assistant',content:txt});
+  }catch{document.getElementById(tid)?.remove();addMob('오류가 발생했습니다.','ai');}
+  btn.disabled=false;
+}
+let mc=0;
+function addMob(text,type){
+  const id='mb'+(mc++);const body=document.getElementById('mob-chat-body');
+  const d=document.createElement('div');d.id=id;d.className=type==='user'?'b-user':'b-ai';
+  d.innerHTML=text.replace(/\n/g,'<br>');body.appendChild(d);body.scrollTop=99999;return id;
+}
+function qs(s){showChatScreen();setTimeout(()=>{document.getElementById('mob-input').value=s;mobSend();},80);}
+function toast(msg){
+  const t=document.getElementById('mob-toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+const ctx=new URLSearchParams(location.search).get('ctx');
+if(ctx){showChatScreen();setTimeout(()=>qs(decodeURIComponent(ctx)),300);}
+</script>
+</body>
+</html>

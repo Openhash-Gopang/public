@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>K-Public — AI 정부 플랫폼</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#111827;background:#f8f9fa;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none}
+
+:root{
+  --sky:      #0369a1;
+  --sky-dk:   #075985;
+  --sky-bg:   #f0f9ff;
+  --sky-bd:   #bae6fd;
+  --green:    #16a34a;
+  --green-bg: #f0fdf4;
+  --orange:   #ea580c;
+  --orange-bg:#fff7ed;
+  --purple:   #7c3aed;
+  --danger:   #ef4444;
+  --danger-bg:#fef2f2;
+  --border:   #e5e7eb;
+  --txt2:     #4b5563;
+  --txt3:     #6b7280;
+  --sb-w:     52px;
+  --sb-open:  232px;
+}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══ 사이드바 ══ */
+.sidebar{position:fixed;top:0;left:0;bottom:0;z-index:300;width:var(--sb-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s cubic-bezier(.4,0,.2,1),box-shadow .2s}
+.sidebar:hover{width:var(--sb-open);box-shadow:4px 0 20px rgba(0,0,0,.08)}
+.sb-inner{width:var(--sb-open);flex:1;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sb-inner::-webkit-scrollbar{display:none}
+.sb-logo{height:56px;flex-shrink:0;display:flex;align-items:center;padding:0 15px;gap:11px;border-bottom:1px solid var(--border);white-space:nowrap}
+.sb-mark{width:26px;height:26px;border-radius:7px;background:var(--sky);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sb-mark svg{width:14px;height:14px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sb-title{font-size:14px;font-weight:800;color:#111;letter-spacing:-.2px}
+.sb-sub{font-size:9px;color:var(--txt3);margin-top:1px}
+.sb-group{padding:16px 0 3px 15px;font-size:9px;font-weight:700;color:#c0c7d0;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;height:26px;opacity:0;transition:opacity .15s}
+.sidebar:hover .sb-group{opacity:1}
+.sb-item{display:flex;align-items:center;height:38px;padding:0 13px;margin:1px 6px;border-radius:8px;color:#6b7280;cursor:pointer;white-space:nowrap;transition:background .13s,color .13s;flex-shrink:0}
+.sb-item:hover{background:#f3f4f6;color:#111}
+.sb-item.active{background:var(--sky);color:#fff}
+.sb-icon{width:16px;height:16px;flex:0 0 16px;display:flex;align-items:center;justify-content:center}
+.sb-icon svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+.sb-lbl{font-size:12.5px;font-weight:500;color:#374151;opacity:0;transition:opacity .13s .04s;flex:1;margin-left:10px}
+.sidebar:hover .sb-lbl{opacity:1}
+.sb-item.active .sb-lbl,.sb-item.active .sb-icon{color:#fff}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;opacity:0;transition:opacity .13s .04s}
+.sidebar:hover .sb-dot{opacity:1}
+.sb-item.active .sb-dot{background:rgba(255,255,255,.7)}
+.sb-foot{margin-top:auto;border-top:1px solid var(--border);padding:10px 6px;flex-shrink:0;width:var(--sb-open)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 7px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:background .13s}
+.sb-user:hover{background:#f3f4f6}
+.sb-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--sky),var(--purple));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.sb-uname{font-size:12px;font-weight:600;color:#111;opacity:0;transition:opacity .13s .04s}
+.sb-urole{font-size:10px;color:var(--txt3);opacity:0;transition:opacity .13s .04s}
+.sidebar:hover .sb-uname,.sidebar:hover .sb-urole{opacity:1}
+
+/* ══ 메인 ══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;margin-left:var(--sb-w)}
+.topbar{height:56px;flex-shrink:0;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:12px}
+.topbar-title{font-size:15px;font-weight:700;color:#111}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-primary{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;background:var(--sky);color:#fff;transition:background .14s}
+.btn-primary:hover{background:var(--sky-dk)}
+.btn-ghost{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;color:#374151;border:1px solid var(--border);transition:background .13s}
+.btn-ghost:hover{background:#f3f4f6}
+.btn-danger{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;color:var(--danger);border:1.5px solid #fca5a5;background:#fff;display:flex;align-items:center;gap:5px}
+
+/* ══ 패널 ══ */
+.panel{flex:1;overflow-y:auto;display:none;background:#f8f9fa}
+.panel.active{display:block}
+.chat-panel{flex:1;display:none;flex-direction:column;overflow:hidden}
+.chat-panel.active{display:flex}
+
+/* ══ 홈 랜딩 ══ */
+.hero{padding:72px 40px 56px;text-align:center;background:linear-gradient(180deg,#f0f9ff 0%,#f8f9fa 65%)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sky-bg);border:1px solid var(--sky-bd);color:var(--sky-dk);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;margin-bottom:24px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--sky);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-size:clamp(26px,5vw,52px);font-weight:900;line-height:1.13;letter-spacing:-1.5px;color:#0f172a;margin-bottom:20px}
+.hero h1 .hl{background:linear-gradient(135deg,var(--sky) 0%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(14px,2vw,18px);color:var(--txt2);max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:56px}
+.btn-hero{padding:14px 28px;border-radius:10px;font-size:15px;font-weight:700;background:var(--sky);color:#fff;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(3,105,161,.28);transition:all .18s}
+.btn-hero:hover{background:var(--sky-dk);transform:translateY(-1px)}
+.btn-hero2{padding:14px 28px;border-radius:10px;font-size:15px;font-weight:600;color:#374151;background:#fff;border:1.5px solid var(--border);display:inline-flex;align-items:center;gap:8px;transition:all .18s}
+.btn-hero2:hover{border-color:#9ca3af;transform:translateY(-1px)}
+.hero-stats{display:flex;flex-wrap:wrap;gap:32px;justify-content:center}
+.hstat{text-align:center}
+.hstat-num{font-size:clamp(22px,3.5vw,36px);font-weight:900;color:#0f172a;letter-spacing:-1px;display:block}
+.hstat-num .u{font-size:.52em;color:var(--sky);font-weight:700}
+.hstat-lbl{font-size:12px;color:var(--txt3);margin-top:2px;display:block}
+
+.inner{max-width:1020px;margin:0 auto;padding:0 40px}
+.sec-badge{display:inline-block;background:var(--sky-bg);color:var(--sky-dk);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;margin-bottom:14px;letter-spacing:.3px;text-transform:uppercase}
+.sec-title{font-size:clamp(20px,3.5vw,34px);font-weight:800;color:#0f172a;letter-spacing:-1px;margin-bottom:12px}
+.sec-sub{font-size:15px;color:var(--txt2);max-width:560px;line-height:1.7}
+
+/* 비교표 */
+.compare-sec{background:#f8f9fa;padding:72px 0}
+.compare-table{width:100%;border-collapse:collapse;margin-top:40px;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.compare-table th{padding:15px 20px 15px 28px;text-align:left;font-size:13px;font-weight:700}
+.compare-table th:first-child{padding-left:20px}
+.th-old{background:#f1f5f9;color:#475569}
+.th-new{background:var(--sky);color:#fff}
+.compare-table td{padding:13px 20px 13px 28px;border-top:1px solid var(--border);font-size:13px;color:#374151;vertical-align:middle}
+.compare-table td:first-child{font-weight:500;color:#111;background:#fafafa;padding-left:20px}
+.compare-table td:nth-child(2){color:#94a3b8}
+.compare-table td:nth-child(3){color:var(--sky-dk);font-weight:600;background:var(--sky-bg)}
+.compare-table tr:hover td{background:rgba(3,105,161,.03)}
+
+/* 특징 카드 */
+.features-sec{background:#fff;padding:72px 0}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;margin-top:48px}
+.feat-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;transition:all .2s;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.feat-card:nth-child(1)::before{background:linear-gradient(90deg,var(--sky),var(--purple))}
+.feat-card:nth-child(2)::before{background:linear-gradient(90deg,var(--green),#22d3ee)}
+.feat-card:nth-child(3)::before{background:linear-gradient(90deg,var(--orange),#f59e0b)}
+.feat-card:nth-child(4)::before{background:linear-gradient(90deg,var(--purple),#ec4899)}
+.feat-card:nth-child(5)::before{background:linear-gradient(90deg,#06b6d4,var(--sky))}
+.feat-card:nth-child(6)::before{background:linear-gradient(90deg,#0f172a,#475569)}
+.feat-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.09)}
+.feat-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.feat-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.feat-card h3{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:10px}
+.feat-card p{font-size:13px;color:var(--txt2);line-height:1.75}
+.feat-source{margin-top:14px;padding:8px 12px;background:#f8f9fa;border-radius:8px;font-size:11px;color:var(--txt3);border-left:2px solid var(--sky)}
+
+/* 작동 방식 */
+.how-sec{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:72px 0;color:#fff}
+.steps{display:flex;flex-direction:column;margin-top:48px}
+.step{display:flex;gap:24px;padding:22px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.step:last-child{border-bottom:none}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--sky);color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-body h4{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:5px}
+.step-body p{font-size:13px;color:#94a3b8;line-height:1.65}
+.step-badge{margin-top:8px;display:inline-block;background:rgba(3,105,161,.2);color:#7dd3fc;border:1px solid rgba(3,105,161,.35);border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
+
+/* 보안 */
+.sec-dark{background:#0f172a;padding:72px 0;color:#fff}
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:40px}
+.sec-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px}
+.sec-card svg{width:22px;height:22px;margin-bottom:12px;stroke:var(--sky);stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+.sec-card h4{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:6px}
+.sec-card p{font-size:12px;color:#64748b;line-height:1.6}
+
+/* CTA */
+.cta-sec{background:linear-gradient(135deg,#0f172a 0%,#0c4a6e 100%);color:#fff;text-align:center;padding:80px 40px}
+.cta-sec h2{font-size:clamp(22px,4vw,40px);font-weight:900;margin-bottom:14px;letter-spacing:-1px}
+.cta-sec p{font-size:16px;color:#94a3b8;margin-bottom:32px}
+.footer{background:#0f172a;color:#475569;padding:28px 40px;text-align:center;font-size:12px}
+
+/* ══ 내부 패널 공통 ══ */
+.ph{padding:28px 28px 0}
+.ph-badge{display:inline-block;background:var(--sky-bg);color:var(--sky-dk);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:700;margin-bottom:10px;letter-spacing:.3px;text-transform:uppercase}
+.ph-title{font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-.5px;margin-bottom:4px}
+.ph-sub{font-size:13px;color:var(--txt2);margin-bottom:24px}
+.panel-body{padding:0 28px 28px}
+.card{background:#fff;border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:14px}
+.card-hd{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hd-t{font-size:13px;font-weight:700;color:#111}
+.card-hd-a{font-size:12px;font-weight:600;color:var(--sky-dk);cursor:pointer}
+.card-bd{padding:16px 18px}
+.data-table{width:100%;border-collapse:collapse;background:#fff;border-radius:11px;overflow:hidden;border:1px solid var(--border);font-size:13px}
+.data-table th{padding:11px 16px;background:#f8f9fa;font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:.4px;text-transform:uppercase;border-bottom:1px solid var(--border);text-align:left}
+.data-table td{padding:11px 16px;border-bottom:1px solid var(--border);color:#374151}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#fafafa}
+.data-table td:first-child{font-weight:500;color:#111}
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px}
+.b-ok{background:var(--green-bg);color:#065f46}
+.b-wait{background:var(--orange-bg);color:#9a3412}
+.b-done{background:#f1f5f9;color:#475569}
+.b-err{background:var(--danger-bg);color:#991b1b}
+.b-sky{background:var(--sky-bg);color:var(--sky-dk)}
+.b-proc{background:#faf5ff;color:#6d28d9}
+
+/* 민원 카테고리 그리드 */
+.category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.cat-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .18s}
+.cat-card:hover{border-color:var(--sky);box-shadow:0 4px 14px rgba(3,105,161,.1);transform:translateY(-2px)}
+.cat-icon{font-size:26px;margin-bottom:8px;display:block}
+.cat-label{font-size:12px;font-weight:700;color:#111}
+.cat-sub{font-size:11px;color:var(--txt3);margin-top:3px}
+
+/* 민원 진행 상태 */
+.progress-bar{background:#e5e7eb;border-radius:8px;height:8px;overflow:hidden;margin:10px 0}
+.progress-fill{height:100%;background:var(--sky);border-radius:8px;transition:width .4s}
+
+/* 알림 */
+.alert-row{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.alert-row:last-child{border-bottom:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.alert-info{flex:1}
+.alert-t{font-size:13px;font-weight:600;color:#111;margin-bottom:2px}
+.alert-d{font-size:12px;color:var(--txt3)}
+.alert-time{font-size:11px;color:var(--txt3);flex-shrink:0}
+
+/* 통계 */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:11px;padding:18px}
+.stat-val{font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-1px}
+.stat-lbl{font-size:12px;color:var(--txt3);margin-top:4px}
+.stat-sub{font-size:11px;font-weight:600;margin-top:4px;color:var(--sky-dk)}
+
+/* 필터 */
+.filter-bar{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
+.f-btn{padding:5px 13px;border-radius:18px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:#374151;cursor:pointer;transition:all .13s}
+.f-btn.active{border-color:var(--sky);background:var(--sky-bg);color:var(--sky-dk)}
+
+/* 채팅 */
+.chat-meta{background:#fff;border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--sky),var(--purple));display:flex;align-items:center;justify-content:center}
+.chat-av svg{width:16px;height:16px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.chat-name{font-size:13px;font-weight:700}
+.chat-status{font-size:11px;color:var(--sky-dk);font-weight:500;display:flex;align-items:center;gap:4px}
+.chat-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--sky);display:inline-block}
+.chat-body{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;background:#f8f9fa}
+.b-ai{max-width:72%;align-self:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px 13px 13px 13px;padding:11px 14px;font-size:13.5px;line-height:1.7;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.b-user{max-width:72%;align-self:flex-end;background:var(--sky);color:#fff;border-radius:13px 13px 4px 13px;padding:11px 14px;font-size:13.5px;line-height:1.7}
+.b-sys{align-self:center;background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--txt3)}
+.quick-row{display:flex;flex-wrap:wrap;gap:7px;align-self:flex-start}
+.qb{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:5px 12px;font-size:12px;font-weight:500;color:#374151;cursor:pointer;transition:all .12s}
+.qb:hover{border-color:var(--sky);background:var(--sky-bg);color:var(--sky-dk)}
+.chat-wrap{border-top:1px solid var(--border);background:#fff;padding:10px 16px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.chat-inp{flex:1;background:#f3f4f6;border:1px solid var(--border);border-radius:11px;padding:9px 13px;font-family:'Inter',sans-serif;font-size:13.5px;resize:none;outline:none;max-height:110px;transition:border-color .13s}
+.chat-inp:focus{border-color:var(--sky);background:#fff}
+.chat-send{width:36px;height:36px;border-radius:10px;background:var(--sky);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .13s;border:none}
+.chat-send:hover{background:var(--sky-dk)}
+.chat-send:disabled{background:#bae6fd;cursor:default}
+.chat-send svg{width:15px;height:15px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* 폼 */
+.f-group{margin-bottom:12px}
+.f-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
+.f-input{width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .13s}
+.f-input:focus{border-color:var(--sky)}
+.f-select{width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-family:'Inter',sans-serif;font-size:13px;outline:none}
+.f-btn-full{width:100%;padding:10px;border-radius:8px;background:var(--sky);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;margin-top:4px;transition:background .13s}
+.f-btn-full:hover{background:var(--sky-dk)}
+
+/* 토스트·모달 */
+.toast{position:fixed;top:16px;right:16px;z-index:9999;background:#0f172a;color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-8px);transition:all .2s;max-width:320px;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;max-width:460px;width:calc(100% - 32px);max-height:82vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{font-size:18px;color:var(--txt3);cursor:pointer}
+
+@media(max-width:1100px){.stat-grid{grid-template-columns:1fr 1fr}.category-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.features-grid{grid-template-columns:1fr 1fr}.stat-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ 사이드바 ══ -->
+<aside class="sidebar">
+<div class="sb-inner">
+  <div class="sb-logo">
+    <div class="sb-mark">
+      <!-- 정부 건물 아이콘 -->
+      <svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
+    </div>
+    <div>
+      <div class="sb-title">K-Public</div>
+      <div class="sb-sub">고팡 AI 정부</div>
+    </div>
+  </div>
+
+  <div class="sb-group">시민</div>
+
+  <button class="sb-item active" onclick="show('home',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span class="sb-lbl">홈</span>
+  </button>
+
+  <button class="sb-item" onclick="show('chat',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+    <span class="sb-lbl">AI 공무원 상담</span>
+  </button>
+
+  <button class="sb-item" onclick="show('civil',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+    <span class="sb-lbl">민원 발급</span>
+    <span class="sb-dot"></span>
+  </button>
+
+  <button class="sb-item" onclick="show('permit',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+    <span class="sb-lbl">인허가 신청</span>
+  </button>
+
+  <button class="sb-item" onclick="show('localinfo',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+    <span class="sb-lbl">지역 정보 조회</span>
+  </button>
+
+  <button class="sb-item" onclick="show('report',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+    <span class="sb-lbl">공공 시설 신고</span>
+    <span class="sb-dot"></span>
+  </button>
+
+  <button class="sb-item" onclick="show('welfare',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span class="sb-lbl">복지 & 지원금</span>
+  </button>
+
+  <button class="sb-item" onclick="show('tax',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+    <span class="sb-lbl">세금 & 과태료</span>
+  </button>
+
+  <button class="sb-item" onclick="show('history',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+    <span class="sb-lbl">행정 기록 (PDV)</span>
+  </button>
+
+  <div class="sb-group">기관</div>
+
+  <button class="sb-item" onclick="show('institution',this)">
+    <span class="sb-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+    <span class="sb-lbl">기관 통계 & 감사</span>
+  </button>
+
+  <div class="sb-foot">
+    <a href="https://gopang.net" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;color:var(--txt3);transition:background .13s;overflow:hidden;white-space:nowrap;">
+      <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span class="sb-lbl" style="font-size:12px;font-weight:600">← 고팡으로</span>
+    </a>
+    <div class="sb-user">
+      <div class="sb-av">나</div>
+      <div><div class="sb-uname">고팡 사용자</div><div class="sb-urole">PDV 연결됨</div></div>
+    </div>
+  </div>
+</div>
+</aside>
+
+<!-- ══ 메인 ══ -->
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">홈</span>
+    <div class="topbar-right">
+      <button class="btn-danger" onclick="show('report',null)">
+        <svg width="13" height="13" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        신고·민원
+      </button>
+      <button class="btn-primary" onclick="show('chat',null)">AI 공무원 상담</button>
+    </div>
+  </div>
+
+  <!-- ════ 홈 랜딩 ════ -->
+  <div class="panel active" id="p-home" style="background:#fff">
+  <div style="overflow-y:auto;height:100%">
+
+    <div class="hero">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        전국 행정 기관 연계 · 고팡 AI 생태계
+      </div>
+      <h1>"등본 발급해 줘."<br><span class="hl">말 한 마디로 끝나는 행정</span></h1>
+      <p class="hero-sub">
+        민원 발급·인허가·시설 신고·복지 신청·지역 정보 조회 —
+        AI 공무원이 24시간 대신 처리하고, 결과를 PDV에 기록합니다
+      </p>
+      <div class="hero-cta">
+        <button class="btn-hero" onclick="show('chat',null)">
+          <svg width="17" height="17" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          AI 공무원에게 요청하기
+        </button>
+        <button class="btn-hero2" onclick="document.getElementById('compare-anchor').scrollIntoView({behavior:'smooth'})">
+          현실 정부와 비교하기
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-num">24<span class="u">시간</span></span><span class="hstat-lbl">365일 민원 처리</span></div>
+        <div class="hstat"><span class="hstat-num">∞<span class="u"></span></span><span class="hstat-lbl">대기 없는 행정 서비스</span></div>
+        <div class="hstat"><span class="hstat-num">100<span class="u">%</span></span><span class="hstat-lbl">PDV 투명 행정 기록</span></div>
+        <div class="hstat"><span class="hstat-num">0<span class="u">원</span></span><span class="hstat-lbl">AI 공무원 이용료</span></div>
+      </div>
+    </div>
+
+    <!-- 비교표 -->
+    <div class="compare-sec" id="compare-anchor">
+      <div class="inner">
+        <div class="sec-badge">현실 정부 vs K-Public</div>
+        <h2 class="sec-title">AI 평행 정부는 이렇게 다릅니다</h2>
+        <p class="sec-sub">줄 서고, 서류 떼고, 다시 방문하는 행정을 말 한 마디로 해결합니다.</p>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;background:#f8f9fa">비교 항목</th>
+              <th class="th-old">현실 정부</th>
+              <th class="th-new">K-Public AI 공무원</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>운영 시간</td><td>평일 09:00–18:00</td><td><strong>24시간 365일</strong></td></tr>
+            <tr><td>민원 처리 방식</td><td>직접 방문 또는 온라인 직접 입력</td><td>말 한 마디 → <strong>AI가 대신 처리</strong></td></tr>
+            <tr><td>서류 작성</td><td>시민이 직접 작성</td><td>PDV 정보 기반 <strong>자동 작성·제출</strong></td></tr>
+            <tr><td>처리 현황 파악</td><td>전화 문의 또는 재방문</td><td><strong>실시간 단계별 보고</strong></td></tr>
+            <tr><td>지역 예산·사업 정보</td><td>공보 또는 직접 문의</td><td>공공 데이터 <strong>실시간 조회·요약</strong></td></tr>
+            <tr><td>시설 신고 처리</td><td>신고 후 처리 여부 불투명</td><td>신고 즉시 <strong>담당 부서 배정·추적</strong></td></tr>
+            <tr><td>복지 서비스 안내</td><td>시민이 직접 검색</td><td>PDV 정보 기반 <strong>맞춤 복지 자동 안내</strong></td></tr>
+            <tr><td>행정 기록 보관</td><td>기관 서버 (열람 제한)</td><td>시민 본인 <strong>PDV에 암호화 저장</strong></td></tr>
+            <tr><td>부패·비효율</td><td>담당자 개인 편차 존재</td><td>AI 처리 → <strong>편차·부패 원천 차단</strong></td></tr>
+            <tr style="background:linear-gradient(90deg,#f0f9ff,#f5f3ff)">
+              <td style="font-weight:700;color:#0f172a">행정 투명성</td>
+              <td>내부 결정 불투명</td>
+              <td style="font-weight:700;color:#0f172a">전 과정 PDV 기록 → <strong>위변조 불가 행정 이력</strong><br><small style="font-weight:400;color:var(--sky-dk)">→ K-Public만의 고유한 강점</small></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 특징 카드 -->
+    <div class="features-sec">
+      <div class="inner">
+        <div class="sec-badge">핵심 특징</div>
+        <h2 class="sec-title">AI 공무원은 어떻게 다른가요</h2>
+        <p class="sec-sub">단순 민원 앱이 아닙니다. 현실 정부를 대신해 실제 업무를 수행하는 AI 행정 시스템입니다.</p>
+        <div class="features-grid">
+
+          <div class="feat-card" style="grid-column:1/-1;border:2px solid var(--sky);background:linear-gradient(135deg,#f0f9ff 0%,#f5f3ff 100%)">
+            <div style="display:flex;align-items:flex-start;gap:20px">
+              <div class="feat-icon" style="background:#fff;color:var(--sky-dk);flex-shrink:0;width:52px;height:52px;border-radius:14px;box-shadow:0 2px 8px rgba(3,105,161,.2)">
+                <svg viewBox="0 0 24 24" style="width:26px;height:26px"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:700;color:var(--sky-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">K-Public 핵심 우위</div>
+                <h3 style="font-size:19px;margin-bottom:10px;color:#0f172a">광범위한 행정 지식 + 전 생애 PDV 기록</h3>
+                <p style="font-size:13.5px;color:#374151;line-height:1.8">
+                  K-Public AI 공무원은 두 가지를 동시에 갖춥니다. 첫째, 전국의 법령·조례·행정 절차를 웹 검색과 공공 데이터 포털을 통해 <strong>실시간으로 파악</strong>합니다. 어떤 담당 공무원도 모든 법령과 조례를 혼자 알 수는 없지만, AI 공무원은 즉시 확인합니다. 둘째, 시민의 고팡 PDV에 저장된 <strong>과거 행정 처리 이력·가족 정보·주소 이력</strong>을 동의 하에 참조하여 서류를 자동 작성합니다.<br><br>
+                  시민은 복잡한 서류를 채울 필요가 없습니다. 요청만 하면 됩니다. <strong>이것이 K-Public만이 제공할 수 있는 고유한 가치입니다.</strong>
+                </p>
+                <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">📜 법령·조례 실시간 참조</span>
+                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">🔐 PDV 기반 서류 자동 작성</span>
+                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">📊 공공 데이터 포털 연동</span>
+                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">🏛️ 전국 행정 기관 연계</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feat-card">
+            <div class="feat-icon" style="background:var(--sky-bg);color:var(--sky-dk)">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <h3>민원 서류 자동 발급</h3>
+            <p>등본·초본·인감·사업자등록증·납세증명 등 모든 민원 서류를 AI가 대신 신청·발급합니다. PDV에 저장된 정보로 서류를 자동 작성하며, 발급된 서류는 PDV에 보관됩니다.</p>
+            <div class="feat-source">📋 정부24·민원24 연계 · PDV 자동 작성 · 발급 즉시 PDV 저장</div>
+          </div>
+
+          <div class="feat-card">
+            <div class="feat-icon" style="background:var(--green-bg);color:#065f46">
+              <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <h3>인허가 신청 대행</h3>
+            <p>건축 허가·식품 영업 허가·각종 신고를 AI가 대신 신청합니다. 필요 서류를 자동으로 파악하고 작성·제출하며, 처리 현황을 실시간으로 추적합니다.</p>
+            <div class="feat-source">🏗️ 건축법·식품위생법·각종 특별법 실시간 참조 · 필요 서류 자동 파악</div>
+          </div>
+
+          <div class="feat-card">
+            <div class="feat-icon" style="background:var(--orange-bg);color:var(--orange)">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3>지역 정보 실시간 조회</h3>
+            <p>우리 동네 올해 공공 사업·예산·도로 정비 계획·가로수 현황을 공공 데이터 포털과 웹 검색으로 실시간 조회·요약합니다. 지역 의정 활동·조례도 쉬운 말로 안내합니다.</p>
+            <div class="feat-source">📊 공공 데이터 포털 · 지방재정 공개 시스템 · 국토정보 플랫폼 연동</div>
+          </div>
+
+          <div class="feat-card">
+            <div class="feat-icon" style="background:#f5f3ff;color:#7c3aed">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3>공공 시설 신고 & 추적</h3>
+            <p>도로 파손·상하수도 문제·가로등 고장·불법 주정차를 신고하면 담당 부서가 즉시 배정됩니다. 처리 현황을 실시간으로 추적하고 완료 시 PDV에 기록됩니다.</p>
+            <div class="feat-source">🔧 담당 부서 자동 배정 · 실시간 처리 추적 · 미처리 시 자동 에스컬레이션</div>
+          </div>
+
+          <div class="feat-card">
+            <div class="feat-icon" style="background:var(--sky-bg);color:var(--sky-dk)">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3>맞춤 복지 자동 안내</h3>
+            <p>PDV의 가족 정보·소득·주소를 분석하여 신청 가능한 복지·지원금을 자동으로 찾아줍니다. 신청 서류를 대신 작성하고 제출까지 대행합니다.</p>
+            <div class="feat-source">💰 복지로·사회보장정보원 연계 · 맞춤 혜택 자동 탐색 · 신청 대행</div>
+          </div>
+
+          <div class="feat-card">
+            <div class="feat-icon" style="background:#f1f5f9;color:#475569">
+              <svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3>행정 기록 PDV 보관</h3>
+            <p>모든 민원 처리 결과·발급 서류·행정 이력은 시민 본인의 PDV에 암호화 저장됩니다. 동일 민원 재신청 시 이전 기록을 자동 참조하며, 행정 투명성을 보장합니다.</p>
+            <div class="feat-source">🔐 AES-256-GCM 암호화 · OpenHash 불변 저장 · 전자정부법 준수</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 작동 방식 -->
+    <div class="how-sec">
+      <div class="inner">
+        <div class="sec-badge" style="background:rgba(3,105,161,.2);color:#7dd3fc">작동 방식</div>
+        <h2 class="sec-title" style="color:#fff">K-Public은 어떻게 작동하나요?</h2>
+        <p class="sec-sub" style="color:#94a3b8">6단계 AI 행정 워크플로우 — 요청부터 결과 기록까지 자동화됩니다.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>요청 입력</h4>
+              <p>말 또는 텍스트로 요청합니다. "등본 발급해 줘", "건축 허가 받아 줘", "우리 동네 올해 예산 알려줘" — 어떤 형식이든 됩니다. AI 공무원이 요청 유형을 자동 분류합니다.</p>
+              <span class="step-badge">자연어 요청 · 24시간 응답 · PDV 이력 자동 참조</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>담당 기관 및 절차 파악</h4>
+              <p>웹 검색과 공공 데이터 포털을 통해 담당 기관·부서·최신 절차·필요 서류·처리 기간·수수료를 실시간으로 확인합니다. 법령이 개정되어도 항상 최신 정보를 제공합니다.</p>
+              <span class="step-badge">웹 검색 기반 최신 절차 · 법령 실시간 확인 · 담당 부서 자동 파악</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>서류 자동 작성</h4>
+              <p>PDV에 저장된 시민 정보(주소·가족·소득·과거 이력)를 동의 하에 참조하여 필요 서류를 자동으로 작성합니다. 시민은 내용을 확인하고 동의만 하면 됩니다.</p>
+              <span class="step-badge">PDV 정보 자동 반영 · 시민 확인·동의 후 제출 · 오류 자동 검토</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h4>기관 제출 및 추적</h4>
+              <p>확인된 서류를 해당 기관에 전자 제출합니다. 접수 번호를 받아 처리 현황을 실시간으로 추적하며, 단계별로 시민에게 보고합니다. 처리가 지연되면 자동으로 담당자에게 확인 요청합니다.</p>
+              <span class="step-badge">전자 제출 · 실시간 처리 추적 · 지연 시 자동 에스컬레이션</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <h4>결과 보고</h4>
+              <p>처리가 완료되면 결과를 시민에게 즉시 보고합니다. 발급된 서류·승인 결과·처리 내역을 정리하여 전달하며, 추가 조치가 필요한 경우 다음 단계를 안내합니다.</p>
+              <span class="step-badge">완료 즉시 보고 · 서류 전달 · 추가 조치 안내</span>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-body">
+              <h4>PDV 행정 기록 저장</h4>
+              <p>모든 처리 결과·발급 서류·행정 이력이 시민의 PDV에 암호화 저장됩니다. 향후 동일 민원 재신청 시 자동으로 참조되며, 행정 처리의 전 과정이 투명하게 기록됩니다.</p>
+              <span class="step-badge">전 과정 PDV 암호화 저장 · 재신청 시 자동 참조 · 행정 투명성 보장</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 보안 -->
+    <div class="sec-dark">
+      <div class="inner">
+        <div class="sec-badge" style="background:rgba(255,255,255,.1);color:#94a3b8">데이터 보안</div>
+        <h2 class="sec-title" style="color:#fff">행정 기록은 오직 시민 본인만 가집니다</h2>
+        <p class="sec-sub" style="color:#64748b">기관도, 제3자도, 정부도 열람할 수 없습니다. 행정 투명성의 새로운 기준입니다.</p>
+        <div class="sec-grid">
+          <div class="sec-card">
+            <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            <h4>OpenHash 불변 행정 원장</h4>
+            <p>모든 민원 처리 기록을 수학적으로 불변 저장 · 위변조 원천 차단 · 행정 부패 구조적 방지</p>
+          </div>
+          <div class="sec-card">
+            <svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <h4>AES-256-GCM 암호화</h4>
+            <p>행정 서류·처리 이력 전체 암호화 · 시민 본인만 열람 · 동의 없이 제3자 공유 불가</p>
+          </div>
+          <div class="sec-card">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <h4>고팡 PDV 신원 기반</h4>
+            <p>시민의 고팡 PDV 신원으로만 행정 대행 · 본인 확인 후 처리 · 신원 도용 원천 차단</p>
+          </div>
+          <div class="sec-card">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            <h4>전자정부법·개인정보보호법</h4>
+            <p>전자정부법·행정 절차법·개인정보보호법 완전 준수 · AI 대행은 서류 작성·제출에 한정</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-sec">
+      <div class="inner">
+        <h2>지금 바로 AI 공무원에게 요청하세요</h2>
+        <p>고팡 계정이 있으면 즉시 시작할 수 있습니다.<br>줄 서지 않아도 됩니다. 서류를 채우지 않아도 됩니다.</p>
+        <div class="hero-cta">
+          <button class="btn-hero" onclick="show('chat',null)" style="font-size:16px;padding:16px 32px">
+            <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            AI 공무원에게 요청하기
+          </button>
+          <a href="https://gopang.net" class="btn-hero2" style="font-size:16px;padding:16px 32px;background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">고팡으로 돌아가기</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div style="margin-bottom:6px;color:#64748b">K-Public · 고팡 AI 생태계 · AI City Inc. · 전자정부법 준수</div>
+      <div>전국 행정 기관 연계 · OpenHash 기술 적용 · PDV 신원 기반 · <a href="https://gopang.net" style="color:var(--sky)">gopang.net</a></div>
+    </div>
+  </div>
+  </div><!-- /p-home -->
+
+  <!-- ════ AI 공무원 채팅 ════ -->
+  <div class="chat-panel" id="p-chat">
+    <div class="chat-meta">
+      <div class="chat-av"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg></div>
+      <div>
+        <div class="chat-name">K-Public AI 공무원</div>
+        <div class="chat-status">24시간 응답 · PDV 연동 가능</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:7px">
+        <button class="btn-ghost" style="font-size:12px" onclick="toast('🔐 PDV 연동 완료. 행정 정보를 참조합니다.')">🔐 PDV</button>
+        <button class="btn-ghost" style="font-size:12px" onclick="toast('🔍 웹 검색 활성화. 최신 법령·절차를 확인합니다.')">🔍 웹 검색</button>
+      </div>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="b-ai">안녕하세요! 저는 K-Public AI 공무원입니다. 🏛️<br><br>민원 발급, 인허가 신청, 지역 정보 조회, 공공 시설 신고, 복지 서비스 안내 등 모든 공공 행정 업무를 대신 처리합니다.<br><br>요청하신 업무를 파악한 뒤, 최신 법령과 절차를 확인하고, PDV 정보를 바탕으로 서류를 자동 작성합니다. 시민께서는 동의만 하시면 됩니다.<br><br><em style="font-size:12px;color:var(--txt3)">※ 모든 처리 결과는 PDV에 저장됩니다 · 전자정부법 준수</em></div>
+      <div class="b-sys">아래에서 빠르게 시작하세요</div>
+      <div class="quick-row">
+        <button class="qb" onclick="qs('주민등록등본 발급해 줘')">📋 등본 발급</button>
+        <button class="qb" onclick="qs('식당 영업 허가 신청해 줘')">🍽️ 영업 허가</button>
+        <button class="qb" onclick="qs('우리 동네 올해 공공 사업 예산 알려줘')">📊 지역 예산</button>
+        <button class="qb" onclick="qs('앞 도로가 파손됐어요. 신고해 줘')">🚧 도로 신고</button>
+        <button class="qb" onclick="qs('받을 수 있는 복지 지원금 알려줘')">💰 복지 안내</button>
+        <button class="qb" onclick="qs('건축 허가 어떻게 받아?')">🏗️ 건축 허가</button>
+        <button class="qb" onclick="qs('상하수도 누수 신고해 줘')">🔧 상하수도</button>
+        <button class="qb" onclick="qs('자동차세 납부 조회해 줘')">💳 세금 조회</button>
+      </div>
+    </div>
+    <div class="chat-wrap">
+      <textarea class="chat-inp" id="chat-input" rows="1"
+        placeholder="행정 업무를 말씀해 주세요…"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}"></textarea>
+      <button class="chat-send" id="chat-send-btn" onclick="chatSend()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════ 민원 발급 ════ -->
+  <div class="panel" id="p-civil">
+    <div class="ph">
+      <div class="ph-badge">민원 발급</div>
+      <div class="ph-title">민원 서류 발급 대행</div>
+      <div class="ph-sub">AI 공무원이 PDV 정보로 서류를 자동 작성하고 발급합니다. 발급된 서류는 PDV에 보관됩니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="category-grid">
+        <div class="cat-card" onclick="qs('주민등록등본 발급해 줘')"><span class="cat-icon">🏠</span><div class="cat-label">주민등록등본</div><div class="cat-sub">즉시 발급</div></div>
+        <div class="cat-card" onclick="qs('주민등록초본 발급해 줘')"><span class="cat-icon">📄</span><div class="cat-label">주민등록초본</div><div class="cat-sub">즉시 발급</div></div>
+        <div class="cat-card" onclick="qs('인감증명서 발급해 줘')"><span class="cat-icon">🔏</span><div class="cat-label">인감증명서</div><div class="cat-sub">1일 이내</div></div>
+        <div class="cat-card" onclick="qs('가족관계증명서 발급해 줘')"><span class="cat-icon">👨‍👩‍👧</span><div class="cat-label">가족관계증명서</div><div class="cat-sub">즉시 발급</div></div>
+        <div class="cat-card" onclick="qs('납세증명서 발급해 줘')"><span class="cat-icon">💰</span><div class="cat-label">납세증명서</div><div class="cat-sub">즉시 발급</div></div>
+        <div class="cat-card" onclick="qs('건강보험료 납부확인서 발급해 줘')"><span class="cat-icon">🏥</span><div class="cat-label">건강보험 확인서</div><div class="cat-sub">즉시 발급</div></div>
+        <div class="cat-card" onclick="qs('토지대장 발급해 줘')"><span class="cat-icon">🗺️</span><div class="cat-label">토지대장</div><div class="cat-sub">즉시 발급</div></div>
+        <div class="cat-card" onclick="qs('건축물대장 발급해 줘')"><span class="cat-icon">🏢</span><div class="cat-label">건축물대장</div><div class="cat-sub">즉시 발급</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-hd-t">📋 최근 발급 내역</span><button class="card-hd-a" onclick="show('history',null)">전체 보기 →</button></div>
+        <div class="card-bd">
+          <table class="data-table">
+            <thead><tr><th>발급일</th><th>서류명</th><th>용도</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td>2026.05.31</td><td>주민등록등본</td><td>금융 기관 제출</td><td><span class="badge b-ok">발급 완료</span></td></tr>
+              <tr><td>2026.05.15</td><td>납세증명서</td><td>입찰 서류</td><td><span class="badge b-ok">발급 완료</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 인허가 신청 ════ -->
+  <div class="panel" id="p-permit">
+    <div class="ph">
+      <div class="ph-badge">인허가 신청</div>
+      <div class="ph-title">인허가·신고 대행</div>
+      <div class="ph-sub">AI 공무원이 최신 법령을 확인하고 필요 서류를 작성·제출합니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="category-grid">
+        <div class="cat-card" onclick="qs('건축 허가 신청해 줘')"><span class="cat-icon">🏗️</span><div class="cat-label">건축 허가</div><div class="cat-sub">건축법 기반</div></div>
+        <div class="cat-card" onclick="qs('식품 영업 허가 신청해 줘')"><span class="cat-icon">🍽️</span><div class="cat-label">식품 영업 허가</div><div class="cat-sub">식품위생법</div></div>
+        <div class="cat-card" onclick="qs('위생 점검 신청해 줘')"><span class="cat-icon">🔬</span><div class="cat-label">위생 점검 신청</div><div class="cat-sub">보건소 연계</div></div>
+        <div class="cat-card" onclick="qs('사업자 등록 신청해 줘')"><span class="cat-icon">🏪</span><div class="cat-label">사업자 등록</div><div class="cat-sub">국세청 연계</div></div>
+        <div class="cat-card" onclick="qs('숙박업 허가 신청해 줘')"><span class="cat-icon">🏨</span><div class="cat-label">숙박업 허가</div><div class="cat-sub">공중위생법</div></div>
+        <div class="cat-card" onclick="qs('폐업 신고해 줘')"><span class="cat-icon">📦</span><div class="cat-label">폐업 신고</div><div class="cat-sub">즉시 처리</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-hd-t">🔄 진행 중인 인허가</span></div>
+        <div class="card-bd">
+          <table class="data-table">
+            <thead><tr><th>신청일</th><th>종류</th><th>담당 기관</th><th>진행률</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td>2026.05.20</td><td>식품 영업 허가</td><td>제주시 위생과</td><td>
+                <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+              </td><td><span class="badge b-proc">심사 중</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 지역 정보 ════ -->
+  <div class="panel" id="p-localinfo">
+    <div class="ph">
+      <div class="ph-badge">지역 정보</div>
+      <div class="ph-title">우리 동네 공공 정보 조회</div>
+      <div class="ph-sub">공공 데이터 포털과 웹 검색으로 실시간 조회합니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-hd"><span class="card-hd-t">🔍 지역 정보 검색</span></div>
+        <div class="card-bd">
+          <div class="f-group"><label class="f-label">지역 (읍면동)</label>
+            <input class="f-input" placeholder="예: 제주시 한림읍" id="local-area">
+          </div>
+          <div class="f-group"><label class="f-label">조회 항목</label>
+            <select class="f-select">
+              <option>올해 공공 사업 & 예산</option>
+              <option>도로 정비 계획</option>
+              <option>가로수·공원 관리</option>
+              <option>상하수도 현황</option>
+              <option>지역 의정 활동</option>
+            </select>
+          </div>
+          <button class="f-btn-full" onclick="searchLocal()">조회하기</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-hd-t">📊 제주시 한림읍 2026년 주요 공공 사업</span><span class="badge b-sky">공공 데이터 기준</span></div>
+        <div class="card-bd">
+          <table class="data-table">
+            <thead><tr><th>사업명</th><th>예산</th><th>기간</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td>한림로 도로 재포장</td><td>4.2억 원</td><td>2026.04–07</td><td><span class="badge b-proc">진행 중</span></td></tr>
+              <tr><td>한림 공원 가로수 정비</td><td>8,500만 원</td><td>2026.05–06</td><td><span class="badge b-ok">완료</span></td></tr>
+              <tr><td>귀덕리 상수도 교체</td><td>1.8억 원</td><td>2026.07–09</td><td><span class="badge b-wait">예정</span></td></tr>
+              <tr><td>한림항 주변 가로등 교체</td><td>3,200만 원</td><td>2026.06–07</td><td><span class="badge b-wait">예정</span></td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px;font-size:11px;color:var(--txt3)">📌 출처: 제주시 지방재정 공개 시스템 · 2026.05 기준 · AI 공무원이 실시간 조회</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 공공 시설 신고 ════ -->
+  <div class="panel" id="p-report">
+    <div class="ph">
+      <div class="ph-badge">공공 시설 신고</div>
+      <div class="ph-title">시설 신고 & 처리 추적</div>
+      <div class="ph-sub">신고 즉시 담당 부서가 배정되고, 처리 현황을 실시간으로 추적합니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="category-grid" style="margin-bottom:16px">
+        <div class="cat-card" onclick="qs('앞 도로가 파손됐어요. 신고해 줘')"><span class="cat-icon">🚧</span><div class="cat-label">도로 파손</div></div>
+        <div class="cat-card" onclick="qs('상수도 누수 신고해 줘')"><span class="cat-icon">💧</span><div class="cat-label">상하수도</div></div>
+        <div class="cat-card" onclick="qs('가로등이 고장났어요. 신고해 줘')"><span class="cat-icon">💡</span><div class="cat-label">가로등 고장</div></div>
+        <div class="cat-card" onclick="qs('불법 주정차 신고해 줘')"><span class="cat-icon">🚗</span><div class="cat-label">불법 주정차</div></div>
+        <div class="cat-card" onclick="qs('쓰레기 불법 투기 신고해 줘')"><span class="cat-icon">🗑️</span><div class="cat-label">불법 투기</div></div>
+        <div class="cat-card" onclick="qs('소음 민원 신고해 줘')"><span class="cat-icon">📢</span><div class="cat-label">소음·악취</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-hd-t">📍 내 신고 현황</span></div>
+        <div class="card-bd">
+          <div class="alert-row">
+            <div class="alert-dot" style="background:var(--green)"></div>
+            <div class="alert-info">
+              <div class="alert-t">한림로 234 앞 도로 파손 신고</div>
+              <div class="alert-d">제주시 도로관리과 배정 · 2026.05.29 신고</div>
+              <div style="margin-top:8px"><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+              <div style="font-size:11px;color:var(--txt3);margin-top:3px">처리 완료 (2026.05.31)</div></div>
+            </div>
+            <span class="badge b-ok">완료</span>
+          </div>
+          <div class="alert-row">
+            <div class="alert-dot" style="background:var(--orange)"></div>
+            <div class="alert-info">
+              <div class="alert-t">귀덕리 상수도 누수 신고</div>
+              <div class="alert-d">제주시 상하수도사업소 배정 · 2026.05.31 신고</div>
+              <div style="margin-top:8px"><div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+              <div style="font-size:11px;color:var(--txt3);margin-top:3px">현장 조사 중 · 예상 완료: 2026.06.03</div></div>
+            </div>
+            <span class="badge b-wait">진행 중</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 복지·지원금 ════ -->
+  <div class="panel" id="p-welfare">
+    <div class="ph">
+      <div class="ph-badge">복지 & 지원금</div>
+      <div class="ph-title">맞춤 복지 서비스 안내 & 신청</div>
+      <div class="ph-sub">PDV 정보를 분석하여 신청 가능한 복지·지원금을 자동으로 찾아드립니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="card" style="border:1.5px solid var(--sky);background:var(--sky-bg);margin-bottom:14px">
+        <div class="card-hd" style="border-bottom-color:var(--sky-bd)"><span class="card-hd-t">🎯 나에게 맞는 복지 자동 탐색</span><span class="badge b-sky">PDV 분석 기반</span></div>
+        <div class="card-bd">
+          <div style="font-size:13px;color:var(--txt2);margin-bottom:12px">PDV에 저장된 가족 정보·소득·주소를 분석하여 신청 가능한 복지 혜택을 자동으로 찾습니다.</div>
+          <button class="f-btn-full" onclick="toast('🔍 PDV 정보를 분석하여 맞춤 복지를 탐색합니다…')">맞춤 복지 탐색하기</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-hd-t">💰 신청 가능한 복지 혜택</span></div>
+        <div class="card-bd">
+          <table class="data-table">
+            <thead><tr><th>서비스명</th><th>지원 금액</th><th>담당 기관</th><th>신청</th></tr></thead>
+            <tbody>
+              <tr><td>청년 월세 지원</td><td>월 20만 원 (12개월)</td><td>제주시 주거복지과</td><td><button class="f-btn-full" style="width:auto;padding:5px 12px;font-size:11px;margin:0" onclick="toast('📋 청년 월세 지원 신청을 대행합니다.')">신청 대행</button></td></tr>
+              <tr><td>에너지 바우처</td><td>연 24만 원</td><td>한국에너지공단</td><td><button class="f-btn-full" style="width:auto;padding:5px 12px;font-size:11px;margin:0" onclick="toast('📋 에너지 바우처 신청을 대행합니다.')">신청 대행</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 세금·과태료 ════ -->
+  <div class="panel" id="p-tax">
+    <div class="ph">
+      <div class="ph-badge">세금 & 과태료</div>
+      <div class="ph-title">세금 조회 & 납부 대행</div>
+      <div class="ph-sub">세금 납부 조회부터 감면 신청, 과태료 이의 신청까지 AI 공무원이 대행합니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="category-grid" style="margin-bottom:16px">
+        <div class="cat-card" onclick="qs('자동차세 납부 조회해 줘')"><span class="cat-icon">🚗</span><div class="cat-label">자동차세</div></div>
+        <div class="cat-card" onclick="qs('재산세 조회해 줘')"><span class="cat-icon">🏠</span><div class="cat-label">재산세</div></div>
+        <div class="cat-card" onclick="qs('종합소득세 신고 도와줘')"><span class="cat-icon">📊</span><div class="cat-label">종합소득세</div></div>
+        <div class="cat-card" onclick="qs('과태료 조회해 줘')"><span class="cat-icon">📋</span><div class="cat-label">과태료 조회</div></div>
+        <div class="cat-card" onclick="qs('세금 분납 신청해 줘')"><span class="cat-icon">💳</span><div class="cat-label">분납 신청</div></div>
+        <div class="cat-card" onclick="qs('세금 감면 신청해 줘')"><span class="cat-icon">💰</span><div class="cat-label">감면 신청</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 행정 기록 ════ -->
+  <div class="panel" id="p-history">
+    <div class="ph">
+      <div class="ph-badge">행정 기록</div>
+      <div class="ph-title">나의 행정 처리 기록 (PDV)</div>
+      <div class="ph-sub">모든 기록은 OpenHash 기술로 위변조 불가하게 암호화 저장됩니다. 오직 본인만 열람합니다.</div>
+    </div>
+    <div class="panel-body">
+      <table class="data-table">
+        <thead><tr><th>처리일</th><th>업무 유형</th><th>내용</th><th>담당 기관</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>2026.05.31</td><td>민원 발급</td><td>주민등록등본</td><td>정부24</td><td><span class="badge b-ok">완료</span></td></tr>
+          <tr><td>2026.05.29</td><td>시설 신고</td><td>도로 파손 (한림로 234)</td><td>제주시 도로관리과</td><td><span class="badge b-ok">완료</span></td></tr>
+          <tr><td>2026.05.20</td><td>인허가</td><td>식품 영업 허가 신청</td><td>제주시 위생과</td><td><span class="badge b-proc">심사 중</span></td></tr>
+          <tr><td>2026.05.15</td><td>민원 발급</td><td>납세증명서</td><td>국세청</td><td><span class="badge b-ok">완료</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════ 기관 통계 ════ -->
+  <div class="panel" id="p-institution">
+    <div class="ph">
+      <div class="ph-badge">기관</div>
+      <div class="ph-title">플랫폼 통계 · 처리 현황 · OpenHash 감사</div>
+      <div class="ph-sub">K-Public 전체 민원 처리 현황과 데이터 무결성을 관리합니다.</div>
+    </div>
+    <div class="panel-body">
+      <div class="stat-grid" style="margin-bottom:16px">
+        <div class="stat-card"><div class="stat-val">12,847</div><div class="stat-lbl">이번 달 총 민원 처리 건</div><div class="stat-sub">전월 대비 +18.4%</div></div>
+        <div class="stat-card"><div class="stat-val">96.3%</div><div class="stat-lbl">민원 처리 완료율</div><div class="stat-sub">목표 95% 초과</div></div>
+        <div class="stat-card"><div class="stat-val">4.2시간</div><div class="stat-lbl">평균 민원 처리 시간</div><div class="stat-sub">현실 대비 89% 단축</div></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-hd"><span class="card-hd-t">업무 유형별 처리 현황</span></div>
+        <div class="card-bd">
+          <table class="data-table">
+            <thead><tr><th>업무 유형</th><th>건수</th><th>평균 처리 시간</th><th>완료율</th></tr></thead>
+            <tbody>
+              <tr><td>민원 서류 발급</td><td>7,241</td><td>2분</td><td>99.8%</td></tr>
+              <tr><td>공공 시설 신고</td><td>2,184</td><td>3.2일</td><td>94.1%</td></tr>
+              <tr><td>복지·지원금 신청</td><td>1,892</td><td>5.1일</td><td>91.3%</td></tr>
+              <tr><td>인허가 신청</td><td>1,530</td><td>12.4일</td><td>87.6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-hd-t">🔐 OpenHash 무결성 검증</span><span class="badge b-ok">정상</span></div>
+        <div class="card-bd">
+          <table class="data-table">
+            <thead><tr><th>검증 시각</th><th>레코드 수</th><th>해시 일치</th><th>이상 탐지</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td>2026.05.31 14:00</td><td>412,891</td><td>412,891</td><td>0</td><td><span class="badge b-ok">정상</span></td></tr>
+              <tr><td>2026.05.31 08:00</td><td>412,104</td><td>412,104</td><td>0</td><td><span class="badge b-ok">정상</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title"><span id="modal-ttl">민원 신청</span><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TITLES={
+  home:'홈', chat:'AI 공무원 상담', civil:'민원 발급',
+  permit:'인허가 신청', localinfo:'지역 정보 조회',
+  report:'공공 시설 신고', welfare:'복지 & 지원금',
+  tax:'세금 & 과태료', history:'행정 기록 (PDV)',
+  institution:'기관 통계 & 감사'
+};
+function show(id,btn){
+  document.querySelectorAll('.panel,.chat-panel').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('p-'+id);
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('topbar-title').textContent=TITLES[id]||'';
+}
+
+const SYS=`당신은 K-Public AI 공무원입니다. 고팡 생태계 공공 행정 서비스에서 운영됩니다.
+
+핵심 역할:
+1. 시민의 공공 행정 요청을 분석하여 담당 기관·부서·절차를 파악
+2. 웹 검색으로 최신 법령·조례·행정 절차를 실시간 확인
+3. PDV 정보 기반 서류 자동 작성·제출 대행 (시민 동의 후)
+4. 진행 상황 단계별 보고 및 결과 PDV 저장
+5. 지역 공공 사업·예산·시설 현황 실시간 조회
+
+처리 범위: 민원 발급, 인허가 신청, 지역 정보 조회, 공공 시설 신고, 복지 신청, 세금·과태료 안내
+
+법적 원칙: AI는 서류 작성·제출을 대행하며, 최종 처분은 담당 공무원이 수행합니다. 시민의 명시적 동의 하에만 진행합니다.
+
+답변 방식: 담당 기관·처리 기간·필요 서류를 명확히 안내하고, 처리 가능 여부와 다음 단계를 항상 제시합니다.`;
+
+let hist=[];
+async function chatSend(){
+  const inp=document.getElementById('chat-input');
+  const msg=inp.value.trim();
+  if(!msg)return;
+  inp.value='';inp.style.height='auto';
+  addBubble(msg,'user');hist.push({role:'user',content:msg});
+  const btn=document.getElementById('chat-send-btn');btn.disabled=true;
+  const tid=addBubble('…','ai');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:hist.slice(-10)})});
+    const d=await r.json();
+    const txt=d.content?.find(c=>c.type==='text')?.text||'잠시 후 다시 시도해 주세요.';
+    document.getElementById(tid)?.remove();addBubble(txt,'ai');
+    hist.push({role:'assistant',content:txt});
+  }catch{document.getElementById(tid)?.remove();addBubble('오류가 발생했습니다. 잠시 후 다시 시도해 주세요.','ai');}
+  btn.disabled=false;
+}
+let bc=0;
+function addBubble(text,type){
+  const id='bb'+(bc++);const body=document.getElementById('chat-body');
+  const d=document.createElement('div');d.id=id;d.className=type==='user'?'b-user':'b-ai';
+  d.innerHTML=text.replace(/\n/g,'<br>');body.appendChild(d);body.scrollTop=99999;return id;
+}
+function qs(s){show('chat',null);setTimeout(()=>{document.getElementById('chat-input').value=s;chatSend();},80);}
+
+function searchLocal(){
+  const area=document.getElementById('local-area').value.trim();
+  toast(`🔍 ${area||'우리 동네'} 공공 정보를 공공 데이터 포털에서 조회합니다…`);
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+const ctx=new URLSearchParams(location.search).get('ctx');
+if(ctx){show('chat',null);setTimeout(()=>qs(decodeURIComponent(ctx)),400);}
+</script>
+</body>
+</html>
