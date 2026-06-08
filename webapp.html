@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
+    <script src="/gopang-wallet.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>K-Public</title>
@@ -10,6 +11,7 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<script type="module" src="https://gopang.net/auth/subsystem-auth.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;color:#111827;background:#f8f9fa;-webkit-font-smoothing:antialiased;overflow:hidden}
@@ -121,6 +123,12 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
 /* 토스트 */
 .toast{position:fixed;top:70px;left:16px;right:16px;background:#111;color:#fff;border-radius:10px;padding:12px 16px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(-10px);transition:all .25s}
 .toast.show{opacity:1;transform:translateY(0)}
+
+/* 마이크 버튼 */
+.chat-mic-btn{width:38px;height:38px;border-radius:50%;background:#f3f4f6;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:background .15s}
+.chat-mic-btn.active{background:#fee2e2;border-color:#fca5a5}
+.chat-mic-btn svg{width:16px;height:16px;stroke:#374151;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.chat-mic-btn.active svg{stroke:var(--danger)}
 </style>
 </head>
 <body>
@@ -131,6 +139,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
       <span class="topbar-name">K-Public</span>
     </div>
     <div class="topbar-right">
+      <span id="auth-badge" style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:#f0f9ff;color:var(--sky-dk);border:1px solid var(--sky-bd);display:none">L0</span>
       <button class="tb-btn-orange" onclick="showScreen('report')">📣 신고</button>
       <button class="tb-btn-sky" onclick="showChatScreen()">AI 공무원</button>
     </div>
@@ -295,9 +304,12 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
     <div class="chat-input-area">
       <textarea class="chat-textarea" id="mob-input" rows="1"
         placeholder="행정 업무를 말씀해 주세요…"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+        oninput="autoResize(this);updateSendBtn()"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();mobSend()}"></textarea>
-      <button class="chat-send-btn" id="mob-send-btn" onclick="mobSend()">
+      <button class="chat-mic-btn" id="mob-mic-btn" onclick="toggleMic()">
+        <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+      </button>
+      <button class="chat-send-btn" id="mob-send-btn" onclick="mobSend()" disabled>
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
       </button>
     </div>
@@ -315,63 +327,277 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
 <div class="toast" id="mob-toast"></div>
 
 <script>
-const SYS=`당신은 K-Public AI 공무원입니다. 고팡 생태계 공공 행정 서비스에서 운영됩니다.
+// ── 상수 ──────────────────────────────────────────────────────
+const PROXY = 'https://gopang-proxy.tensor-city.workers.dev';
+const SP_URL = 'https://raw.githubusercontent.com/Openhash-Gopang/public/main/prompts/SP-KPUBLIC-v1_0.txt';
+const SP_FALLBACK = `당신은 K-Public AI 공무원입니다. 고팡 생태계 공공 행정 서비스에서 운영됩니다.
 시민의 행정 요청을 분석하고, 담당 기관·절차·필요 서류를 안내하며 대행 처리합니다.
 웹 검색으로 최신 법령·조례를 실시간 확인합니다.
 모바일 환경에 맞게 짧고 명확하게, 다음 단계를 항상 안내합니다.`;
 
-let hist=[];
-function showScreen(id,tabEl){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const s=document.getElementById('screen-'+id);if(s)s.classList.add('active');
-  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-  if(tabEl)tabEl.classList.add('active');
-  document.getElementById('content-area').scrollTop=0;
-  document.getElementById('chat-screen').classList.remove('active');
-  document.getElementById('tab-bar').style.display='flex';
+// ── SP 동적 로드 ───────────────────────────────────────────────
+const CFG = { systemPrompt: null };
+async function loadSystemPrompt() {
+  if (CFG.systemPrompt) return CFG.systemPrompt;
+  try {
+    const r = await fetch(SP_URL + '?t=' + Date.now());
+    if (r.ok) { CFG.systemPrompt = await r.text(); return CFG.systemPrompt; }
+  } catch(e) { console.warn('[SP] 로드 실패:', e.message); }
+  CFG.systemPrompt = SP_FALLBACK;
+  return CFG.systemPrompt;
 }
-function showChatScreen(){
+
+// ── AI 호출 — Proxy(DeepSeek) + Claude 폴백 ───────────────────
+async function callAI(messages) {
+  const sp = await loadSystemPrompt();
+  try {
+    const r = await fetch(`${PROXY}/ai/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider:'deepseek', model:'deepseek-chat', system:sp, messages, max_tokens:2000 }),
+    });
+    if (!r.ok) throw new Error(`proxy ${r.status}`);
+    const d = await r.json();
+    return d.content || '잠시 후 다시 시도해 주세요.';
+  } catch(e) {
+    console.warn('[K-Public] DeepSeek 폴백 → Claude:', e.message);
+    const r2 = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:sp, messages:messages.slice(-8) }),
+    });
+    const d2 = await r2.json();
+    return d2.content?.find(c => c.type === 'text')?.text || '오류가 발생했습니다.';
+  }
+}
+
+// ── UI 헬퍼 — autoResize / updateSendBtn ──────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+function updateSendBtn() {
+  const inp = document.getElementById('mob-input');
+  const btn = document.getElementById('mob-send-btn');
+  if (btn) btn.disabled = !inp.value.trim();
+}
+
+// ── 화면 전환 ─────────────────────────────────────────────────
+let hist = [];
+function showScreen(id, tabEl) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById('screen-' + id);
+  if (s) s.classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  document.getElementById('content-area').scrollTop = 0;
+  document.getElementById('chat-screen').classList.remove('active');
+  document.getElementById('tab-bar').style.display = 'flex';
+}
+function showChatScreen() {
   document.getElementById('chat-screen').classList.add('active');
-  document.getElementById('tab-bar').style.display='none';
-  document.getElementById('mob-input').focus();
+  document.getElementById('tab-bar').style.display = 'none';
+  // ★ focus() 미호출 — 안드로이드 소프트 키보드 강제 팝업 방지 (§3.6)
 }
-function hideChatScreen(){
+function hideChatScreen() {
   document.getElementById('chat-screen').classList.remove('active');
-  document.getElementById('tab-bar').style.display='flex';
+  document.getElementById('tab-bar').style.display = 'flex';
 }
-function mobSearchLocal(){
-  const area=document.getElementById('mob-area').value.trim();
-  toast(`📊 ${area||'우리 동네'} 공공 정보를 조회합니다…`);
+
+function mobSearchLocal() {
+  const area = document.getElementById('mob-area').value.trim();
+  toast(`📊 ${area || '우리 동네'} 공공 정보를 조회합니다…`);
 }
-async function mobSend(){
-  const inp=document.getElementById('mob-input');
-  const msg=inp.value.trim();if(!msg)return;
-  inp.value='';inp.style.height='auto';
-  addMob(msg,'user');hist.push({role:'user',content:msg});
-  const btn=document.getElementById('mob-send-btn');btn.disabled=true;
-  const tid=addMob('…','ai');
-  try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:hist.slice(-8)})});
-    const d=await r.json();
-    const txt=d.content?.find(c=>c.type==='text')?.text||'잠시 후 다시 시도해 주세요.';
-    document.getElementById(tid)?.remove();addMob(txt,'ai');hist.push({role:'assistant',content:txt});
-  }catch{document.getElementById(tid)?.remove();addMob('오류가 발생했습니다.','ai');}
-  btn.disabled=false;
+
+// ── 채팅 전송 ─────────────────────────────────────────────────
+async function mobSend() {
+  const inp = document.getElementById('mob-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  autoResize(inp);
+  updateSendBtn();
+  addMob(msg, 'user');
+  hist.push({ role:'user', content:msg });
+  const btn = document.getElementById('mob-send-btn');
+  btn.disabled = true;
+  const tid = addMob('…', 'ai');
+  try {
+    const txt = await callAI(hist.slice(-10));
+    document.getElementById(tid)?.remove();
+    addMob(txt, 'ai');
+    hist.push({ role:'assistant', content:txt });
+    _recordPdv(msg, txt);
+  } catch {
+    document.getElementById(tid)?.remove();
+    addMob('오류가 발생했습니다.', 'ai');
+  }
+  btn.disabled = false;
 }
-let mc=0;
-function addMob(text,type){
-  const id='mb'+(mc++);const body=document.getElementById('mob-chat-body');
-  const d=document.createElement('div');d.id=id;d.className=type==='user'?'b-user':'b-ai';
-  d.innerHTML=text.replace(/\n/g,'<br>');body.appendChild(d);body.scrollTop=99999;return id;
+
+// ── PDV 표준 payload { user_guid, source, report: { pdv_6w } }
+function _recordPdv(userMsg, aiReply) {
+  try {
+    const token = JSON.parse(sessionStorage.getItem('gopang_sso_token') || '{}');
+    const user_guid = token.ipv6 || 'anonymous';
+    const payload = {
+      user_guid,
+      source: 'kpublic',
+      report: {
+        pdv_6w: {
+          who:   user_guid,
+          when:  new Date().toISOString(),
+          where: window._gopangLocation || '위치 미확인',
+          what:  'K-Public AI 공무원 채팅',
+          how:   `민원: ${userMsg.slice(0, 60)}`,
+          why:   '공공 행정 처리 대행',
+        },
+      },
+    };
+    fetch(`${PROXY}/pdv_log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  } catch(e) { console.warn('[PDV]', e.message); }
 }
-function qs(s){showChatScreen();setTimeout(()=>{document.getElementById('mob-input').value=s;mobSend();},80);}
-function toast(msg){
-  const t=document.getElementById('mob-toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+
+let mc = 0;
+function addMob(text, type) {
+  const id = 'mb' + (mc++);
+  const body = document.getElementById('mob-chat-body');
+  const d = document.createElement('div');
+  d.id = id; d.className = type === 'user' ? 'b-user' : 'b-ai';
+  d.innerHTML = text.replace(/\n/g, '<br>');
+  body.appendChild(d); body.scrollTop = 99999; return id;
 }
-const ctx=new URLSearchParams(location.search).get('ctx');
-if(ctx){showChatScreen();setTimeout(()=>qs(decodeURIComponent(ctx)),300);}
+
+function qs(s) {
+  showChatScreen();
+  setTimeout(() => {
+    const inp = document.getElementById('mob-input');
+    inp.value = s;
+    autoResize(inp);
+    updateSendBtn();
+    mobSend();
+  }, 80);
+}
+
+function toast(msg) {
+  const t = document.getElementById('mob-toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── ctx 파라미터 — ctx_enc=b64 분기 ──────────────────────────
+(function initCtx() {
+  const params = new URLSearchParams(location.search);
+  const ctxRaw = params.get('ctx') || '';
+  const ctxEnc = params.get('ctx_enc');
+  const ctx = ctxRaw
+    ? (ctxEnc === 'b64'
+        ? decodeURIComponent(escape(atob(ctxRaw)))
+        : decodeURIComponent(ctxRaw))
+    : null;
+  if (ctx) { showChatScreen(); setTimeout(() => qs(ctx), 300); }
+})();
+
+// ── 마이크 — v3.6 패턴 ───────────────────────────────────────
+let micActive = false;
+let recognition = null;
+let mediaRecorder = null;
+let audioChunks = [];
+
+function _micSetUI(active) {
+  micActive = active;
+  const btn = document.getElementById('mob-mic-btn');
+  if (btn) btn.classList.toggle('active', active);
+}
+
+function _micStartWebSpeech(SR) {
+  recognition = new SR();
+  recognition.lang           = 'ko-KR';
+  recognition.continuous     = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = (e) => {
+    const t = e.results[0][0].transcript;
+    const input = document.getElementById('mob-input');
+    if (input && t) {
+      input.value = t;
+      autoResize(input);   // ★ 직접 호출
+      updateSendBtn();     // ★ 직접 호출
+    }
+    _micSetUI(false);
+    setTimeout(mobSend, 100);
+  };
+
+  recognition.onerror = (e) => {
+    _micSetUI(false);
+    console.warn('[Mic] 오류:', e.error);
+    if (e.error !== 'aborted') toast('🎤 음성 인식 오류: ' + e.error);
+  };
+
+  recognition.onend = () => { _micSetUI(false); };
+
+  recognition.start();
+  _micSetUI(true);
+}
+
+async function _micStartMediaRecorder() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      _micSetUI(false);
+      toast('🎤 iOS에서는 텍스트로 입력해 주세요.');
+    };
+    mediaRecorder.start();
+    _micSetUI(true);
+  } catch(e) {
+    _micSetUI(false);
+    toast('🎤 마이크 권한이 필요합니다.');
+  }
+}
+
+function toggleMic() {
+  if (micActive) {
+    if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    _micSetUI(false);
+    return;
+  }
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!isIOS && SR) {
+    _micStartWebSpeech(SR);
+  } else if (isIOS && window.MediaRecorder) {
+    _micStartMediaRecorder();
+  } else {
+    toast('🎤 이 브라우저에서는 음성 인식을 지원하지 않습니다.');
+  }
+}
+</script>
+
+<script>
+/* ── 고팡 SSO 인증 콜백 ─────────────────────────────────────── */
+window._onGopangAuth = function(user) {
+  if (!user) return;
+  const badge = document.getElementById('auth-badge');
+  if (badge) {
+    badge.textContent = 'Lv.' + (user.level || 0);
+    badge.style.display = 'inline-block';
+  }
+  try {
+    sessionStorage.setItem('gopang_sso_token', JSON.stringify(user));
+  } catch(e) {}
+  console.log('[K-Public] ✅ 인증 완료 —', user.level, user.ipv6?.slice(-8));
+};
 </script>
 </body>
 </html>
+
