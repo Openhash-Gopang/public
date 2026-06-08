@@ -1,329 +1,228 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-    <script src="/gopang-wallet.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>K-Public</title>
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0369a1">
+<meta name="theme-color" content="#ffffff">
+<title>K-Public</title>
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap">
 <script type="module" src="https://gopang.net/auth/subsystem-auth.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Inter',-apple-system,sans-serif;font-size:15px;line-height:1.5;color:#111827;background:#f8f9fa;-webkit-font-smoothing:antialiased;overflow:hidden}
-a{text-decoration:none;color:inherit}
-button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
+html,body{height:100%;height:100dvh;overflow:hidden;
+  font-family:'Pretendard',-apple-system,'Helvetica Neue',sans-serif;
+  font-size:15px;background:#fff;color:#111;-webkit-font-smoothing:antialiased}
 :root{
-  --sky:#0369a1;--sky-dk:#075985;--sky-bg:#f0f9ff;--sky-bd:#bae6fd;
-  --green:#16a34a;--green-bg:#f0fdf4;
-  --orange:#ea580c;--orange-bg:#fff7ed;
-  --danger:#ef4444;--danger-bg:#fef2f2;
-  --border:#e5e7eb;--txt2:#4b5563;--txt3:#6b7280;
+  --sky:#0369a1;--sky-lt:#e0f2fe;--sky-dk:#075985;
+  --border:#e5e7eb;--txt2:#6b7280;--txt3:#9ca3af;
+  --chip-bg:#f3f4f6;--chip-border:#e5e7eb;
+  --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
-.app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;background:#f8f9fa}
 
-/* 상단 바 */
-.topbar{background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:10}
-.topbar-logo{display:flex;align-items:center;gap:8px}
-.topbar-mark{width:30px;height:30px;background:var(--sky);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.topbar-mark svg{width:14px;height:14px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.topbar-name{font-size:16px;font-weight:800;color:#111}
-.topbar-right{margin-left:auto;display:flex;gap:6px}
-.tb-btn-sky{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;background:var(--sky);color:#fff}
-.tb-btn-orange{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;background:var(--orange-bg);color:var(--orange);border:1.5px solid #fed7aa}
+/* ── 앱 레이아웃 ── */
+.app{display:flex;flex-direction:column;height:100%;height:100dvh;max-width:480px;margin:0 auto;background:#fff}
 
-.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.screen{display:none;animation:fadeIn .2s ease}
-.screen.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ── 상단 바 ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-t) + 12px) 16px 12px;
+  border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;
+}
+.topbar-left{display:flex;align-items:center;gap:8px}
+.topbar-icon{width:28px;height:28px;background:var(--sky);border-radius:7px;
+  display:flex;align-items:center;justify-content:center}
+.topbar-icon svg{width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.topbar-name{font-size:15px;font-weight:800;color:#111;letter-spacing:-.3px}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.auth-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  background:var(--chip-bg);color:var(--txt2);border:1px solid var(--chip-border);display:none}
+.report-btn{
+  display:flex;align-items:center;gap:4px;
+  padding:6px 11px;border-radius:8px;font-size:12px;font-weight:700;
+  background:#fff5f0;color:#c2410c;border:1px solid #fed7aa;cursor:pointer;
+}
+.report-btn svg{width:11px;height:11px;stroke:currentColor;stroke-width:2.5;fill:none}
 
-/* 홈 히어로 */
-.home-hero{background:linear-gradient(135deg,var(--sky-dk) 0%,#1e40af 100%);padding:20px 16px;color:#fff}
-.home-hero-title{font-size:18px;font-weight:800;margin-bottom:4px}
-.home-hero-sub{font-size:13px;opacity:.8}
-.hero-stats-row{display:flex;gap:10px;margin-top:14px}
-.hstat-mini{flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center}
-.hsm-val{font-size:16px;font-weight:800;line-height:1.1}
-.hsm-lbl{font-size:10px;opacity:.7;margin-top:2px}
+/* ── 채팅 화면 ── */
+.chat-screen{display:flex;flex-direction:column;flex:1;overflow:hidden}
 
-/* 카테고리 그리드 */
-.section-label{font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;padding:16px 16px 8px}
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
-.cat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .15s}
-.cat-card:active{border-color:var(--sky);background:var(--sky-bg)}
-.cat-icon{font-size:22px;display:block;margin-bottom:4px}
-.cat-label{font-size:11px;font-weight:700;color:#111}
-.cat-sub{font-size:10px;color:var(--txt3);margin-top:2px}
+/* ── 채팅 바디 ── */
+.chat-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 16px 12px;display:flex;flex-direction:column;
+  gap:10px;background:#fff;
+}
 
-/* 진행 민원 */
-.civil-card{margin:0 16px 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
-.civil-title{font-size:14px;font-weight:700;color:#111;margin-bottom:3px}
-.civil-detail{font-size:12px;color:var(--txt3);margin-bottom:8px}
-.progress-bar{background:#e5e7eb;border-radius:8px;height:6px;overflow:hidden}
-.progress-fill{height:100%;background:var(--sky);border-radius:8px}
-.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px}
-.b-ok{background:var(--green-bg);color:#065f46}
-.b-wait{background:var(--orange-bg);color:#9a3412}
-.b-done{background:#f1f5f9;color:#475569}
-.b-proc{background:#faf5ff;color:#6d28d9}
-.b-sky{background:var(--sky-bg);color:var(--sky-dk)}
+/* 인트로 섹션 */
+.intro-section{
+  display:flex;flex-direction:column;align-items:center;
+  padding:36px 0 28px;gap:14px;
+}
+.intro-icon{
+  width:64px;height:64px;border-radius:18px;
+  background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(3,105,161,.25);
+}
+.intro-icon svg{width:30px;height:30px;stroke:#fff;stroke-width:1.8;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.intro-title{font-size:20px;font-weight:800;color:#111;letter-spacing:-.4px;text-align:center}
+.intro-sub{font-size:14px;color:var(--txt2);line-height:1.6;text-align:center}
 
-/* 채팅 */
-.chat-screen{display:none;flex-direction:column;height:100%}
-.chat-screen.active{display:flex}
-.chat-header{background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.chat-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sky),#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.chat-avatar svg{width:16px;height:16px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.chat-header-name{font-size:14px;font-weight:700}
-.chat-header-status{font-size:11px;color:var(--sky-dk);font-weight:500;display:flex;align-items:center;gap:4px}
-.chat-header-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--sky);display:inline-block}
-.chat-back{padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#374151;background:#f3f4f6;border:none;cursor:pointer}
-.chat-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#f8f9fa}
-.b-ai{max-width:88%;align-self:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:10px 13px;font-size:14px;line-height:1.7;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.b-user{max-width:88%;align-self:flex-end;background:var(--sky);color:#fff;border-radius:14px 14px 4px 14px;padding:10px 13px;font-size:14px;line-height:1.7}
-.quick-row{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}
-.qb{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:5px 11px;font-size:12px;font-weight:600;color:#374151;cursor:pointer}
-.qb:active{background:var(--sky-bg);border-color:var(--sky);color:var(--sky-dk)}
-.chat-input-area{background:#fff;border-top:1px solid var(--border);padding:10px 12px;padding-bottom:calc(10px + var(--safe-b));display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
-.chat-textarea{flex:1;background:#f3f4f6;border:1px solid var(--border);border-radius:20px;padding:9px 14px;font-family:'Inter',sans-serif;font-size:14px;resize:none;outline:none;max-height:100px;transition:border-color .15s}
+/* 퀵 칩 */
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:0 4px}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:8px 14px;border-radius:20px;
+  background:#fff;border:1.5px solid var(--chip-border);
+  font-size:13px;font-weight:600;color:#374151;cursor:pointer;
+  transition:border-color .12s,background .12s,color .12s;
+  white-space:nowrap;
+}
+.chip svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.chip:hover,.chip:active{background:var(--sky-lt);border-color:var(--sky);color:var(--sky-dk)}
+
+/* AI/사용자 버블 */
+.b-ai{
+  max-width:88%;align-self:flex-start;
+  background:#f9fafb;border:1px solid var(--border);
+  border-radius:4px 16px 16px 16px;
+  padding:10px 14px;font-size:14px;line-height:1.7;color:#111;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.b-user{
+  max-width:88%;align-self:flex-end;
+  background:var(--sky);color:#fff;
+  border-radius:16px 16px 4px 16px;
+  padding:10px 14px;font-size:14px;line-height:1.7;
+}
+
+/* ── 입력 영역 ── */
+.chat-input-area{
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 12px calc(10px + var(--safe-b));
+  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
+}
+.chat-textarea{
+  flex:1;background:#f3f4f6;border:1.5px solid transparent;
+  border-radius:22px;padding:10px 16px;
+  font-family:'Pretendard',sans-serif;font-size:14px;
+  resize:none;outline:none;max-height:100px;line-height:1.5;
+  transition:border-color .15s,background .15s;color:#111;
+}
+.chat-textarea::placeholder{color:var(--txt3)}
 .chat-textarea:focus{border-color:var(--sky);background:#fff}
-.chat-send-btn{width:38px;height:38px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:none;cursor:pointer}
-.chat-send-btn:disabled{background:var(--sky-bd)}
-.chat-send-btn svg{width:16px;height:16px;stroke:#fff;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-
-/* 탭 바 */
-.tab-bar{background:#fff;border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-b);flex-shrink:0;z-index:10}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;cursor:pointer;font-size:9px;font-weight:600;color:var(--txt3);background:none;border:none;transition:color .15s}
-.tab-item.active{color:var(--sky-dk)}
-.tab-icon{font-size:20px;line-height:1}
-
-/* 지역 정보 */
-.info-card{margin:0 16px 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
-.info-title{font-size:13px;font-weight:700;color:#111;margin-bottom:4px}
-.info-detail{font-size:12px;color:var(--txt3)}
-.info-amount{font-size:14px;font-weight:800;color:var(--sky-dk);margin-top:4px}
-
-/* 폼 */
-.input-card{margin:0 16px 12px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px}
-.f-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
-.f-input{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:14px;outline:none;margin-bottom:10px}
-.f-input:focus{border-color:var(--sky)}
-.f-btn{width:100%;padding:12px;border-radius:9px;background:var(--sky);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer}
-
-/* 신고 화면 */
-.report-card{margin:0 16px 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
-.rc-title{font-size:14px;font-weight:700;color:#111;margin-bottom:3px}
-.rc-detail{font-size:12px;color:var(--txt3);margin-bottom:8px}
-
-/* 토스트 */
-.toast{position:fixed;top:70px;left:16px;right:16px;background:#111;color:#fff;border-radius:10px;padding:12px 16px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(-10px);transition:all .25s}
-.toast.show{opacity:1;transform:translateY(0)}
-
-/* 마이크 버튼 */
-.chat-mic-btn{width:38px;height:38px;border-radius:50%;background:#f3f4f6;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:background .15s}
+.chat-mic-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--chip-bg);border:1.5px solid var(--chip-border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;cursor:pointer;transition:background .12s;
+}
 .chat-mic-btn.active{background:#fee2e2;border-color:#fca5a5}
-.chat-mic-btn svg{width:16px;height:16px;stroke:#374151;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.chat-mic-btn.active svg{stroke:var(--danger)}
+.chat-mic-btn svg{width:16px;height:16px;stroke:#4b5563;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.chat-mic-btn.active svg{stroke:#ef4444}
+.chat-send-btn{
+  width:40px;height:40px;border-radius:50%;background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;border:none;cursor:pointer;
+  transition:background .12s;
+}
+.chat-send-btn:disabled{background:#bae6fd;cursor:not-allowed}
+.chat-send-btn svg{width:16px;height:16px;stroke:#fff;stroke-width:2.2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* ── 토스트 ── */
+.toast{
+  position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(10px);
+  background:#111;color:#fff;border-radius:10px;
+  padding:10px 18px;font-size:13px;font-weight:500;
+  z-index:9999;opacity:0;transition:all .25s;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 <div class="app">
+
+  <!-- 상단 바 -->
   <div class="topbar">
-    <div class="topbar-logo">
-      <div class="topbar-mark"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg></div>
+    <div class="topbar-left">
+      <div class="topbar-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
+      </div>
       <span class="topbar-name">K-Public</span>
     </div>
     <div class="topbar-right">
-      <span id="auth-badge" style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:#f0f9ff;color:var(--sky-dk);border:1px solid var(--sky-bd);display:none">L0</span>
-      <button class="tb-btn-orange" onclick="showScreen('report')">📣 신고</button>
-      <button class="tb-btn-sky" onclick="showChatScreen()">AI 공무원</button>
+      <span class="auth-badge" id="auth-badge">L0</span>
+      <button class="report-btn" onclick="qs('공공 시설 신고해 줘')">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        신고
+      </button>
     </div>
   </div>
 
-  <div class="content" id="content-area">
-
-    <!-- 홈 -->
-    <div class="screen active" id="screen-home">
-      <div class="home-hero">
-        <div class="home-hero-title">안녕하세요! AI 공무원입니다 🏛️</div>
-        <div class="home-hero-sub">말 한 마디로 모든 행정 업무를 처리합니다</div>
-        <div class="hero-stats-row">
-          <div class="hstat-mini"><div class="hsm-val">24h</div><div class="hsm-lbl">365일 운영</div></div>
-          <div class="hstat-mini"><div class="hsm-val">대기 0</div><div class="hsm-lbl">즉시 처리</div></div>
-          <div class="hstat-mini"><div class="hsm-val">PDV</div><div class="hsm-lbl">투명 기록</div></div>
-        </div>
-      </div>
-
-      <div class="section-label">🏛️ 자주 쓰는 민원</div>
-      <div class="cat-grid">
-        <div class="cat-card" onclick="qs('주민등록등본 발급해 줘')"><span class="cat-icon">📋</span><div class="cat-label">등본 발급</div><div class="cat-sub">즉시</div></div>
-        <div class="cat-card" onclick="qs('식품 영업 허가 신청해 줘')"><span class="cat-icon">🍽️</span><div class="cat-label">영업 허가</div><div class="cat-sub">신청 대행</div></div>
-        <div class="cat-card" onclick="qs('우리 동네 공공 사업 예산 알려줘')"><span class="cat-icon">📊</span><div class="cat-label">지역 예산</div><div class="cat-sub">실시간</div></div>
-        <div class="cat-card" onclick="qs('도로 파손 신고해 줘')"><span class="cat-icon">🚧</span><div class="cat-label">도로 신고</div><div class="cat-sub">즉시 접수</div></div>
-        <div class="cat-card" onclick="qs('받을 수 있는 복지 지원금 알려줘')"><span class="cat-icon">💰</span><div class="cat-label">복지 안내</div><div class="cat-sub">맞춤 탐색</div></div>
-        <div class="cat-card" onclick="qs('자동차세 납부 조회해 줘')"><span class="cat-icon">💳</span><div class="cat-label">세금 조회</div><div class="cat-sub">조회 대행</div></div>
-      </div>
-
-      <div class="section-label">🔄 진행 중인 민원</div>
-      <div class="civil-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <div class="civil-title">식품 영업 허가 신청</div>
-          <span class="badge b-proc">심사 중</span>
-        </div>
-        <div class="civil-detail">제주시 위생과 · 2026.05.20 신청</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
-        <div style="font-size:11px;color:var(--txt3);margin-top:4px">70% 완료 · 예상 완료: 2026.06.05</div>
-      </div>
-      <div class="civil-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <div class="civil-title">귀덕리 상수도 누수 신고</div>
-          <span class="badge b-wait">진행 중</span>
-        </div>
-        <div class="civil-detail">제주시 상하수도사업소 · 2026.05.31 신고</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
-        <div style="font-size:11px;color:var(--txt3);margin-top:4px">현장 조사 중 · 예상 완료: 2026.06.03</div>
-      </div>
-      <div style="padding-bottom:16px"></div>
-    </div>
-
-    <!-- 지역 정보 -->
-    <div class="screen" id="screen-localinfo">
-      <div class="section-label">📊 우리 동네 공공 정보</div>
-      <div class="input-card">
-        <label class="f-label">지역 (읍면동)</label>
-        <input class="f-input" placeholder="예: 제주시 한림읍" id="mob-area">
-        <button class="f-btn" onclick="mobSearchLocal()">조회하기</button>
-      </div>
-      <div class="section-label">📌 제주시 한림읍 2026년 공공 사업</div>
-      <div class="info-card">
-        <div class="info-title">🚧 한림로 도로 재포장</div>
-        <div class="info-detail">제주시 도로관리과 · 2026.04–07</div>
-        <div class="info-amount">예산: 4.2억 원</div>
-        <div style="margin-top:6px"><span class="badge b-proc">진행 중</span></div>
-      </div>
-      <div class="info-card">
-        <div class="info-title">🌳 한림 공원 가로수 정비</div>
-        <div class="info-detail">제주시 공원녹지과 · 2026.05–06</div>
-        <div class="info-amount">예산: 8,500만 원</div>
-        <div style="margin-top:6px"><span class="badge b-ok">완료</span></div>
-      </div>
-      <div class="info-card">
-        <div class="info-title">💧 귀덕리 상수도 교체</div>
-        <div class="info-detail">제주시 상하수도사업소 · 2026.07–09</div>
-        <div class="info-amount">예산: 1.8억 원</div>
-        <div style="margin-top:6px"><span class="badge b-wait">예정</span></div>
-      </div>
-      <div style="padding-bottom:16px"></div>
-    </div>
-
-    <!-- 신고 -->
-    <div class="screen" id="screen-report">
-      <div class="section-label">📣 공공 시설 신고</div>
-      <div class="cat-grid" style="margin-bottom:16px">
-        <div class="cat-card" onclick="qs('도로 파손 신고해 줘')"><span class="cat-icon">🚧</span><div class="cat-label">도로 파손</div></div>
-        <div class="cat-card" onclick="qs('상하수도 누수 신고해 줘')"><span class="cat-icon">💧</span><div class="cat-label">상하수도</div></div>
-        <div class="cat-card" onclick="qs('가로등 고장 신고해 줘')"><span class="cat-icon">💡</span><div class="cat-label">가로등</div></div>
-        <div class="cat-card" onclick="qs('불법 주정차 신고해 줘')"><span class="cat-icon">🚗</span><div class="cat-label">불법 주정차</div></div>
-        <div class="cat-card" onclick="qs('쓰레기 불법 투기 신고해 줘')"><span class="cat-icon">🗑️</span><div class="cat-label">불법 투기</div></div>
-        <div class="cat-card" onclick="qs('소음 민원 신고해 줘')"><span class="cat-icon">📢</span><div class="cat-label">소음·악취</div></div>
-      </div>
-      <div class="section-label">📍 내 신고 현황</div>
-      <div class="report-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <div class="rc-title">한림로 234 도로 파손</div>
-          <span class="badge b-ok">완료</span>
-        </div>
-        <div class="rc-detail">제주시 도로관리과 · 2026.05.29 신고 · 2026.05.31 완료</div>
-      </div>
-      <div class="report-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <div class="rc-title">귀덕리 상수도 누수</div>
-          <span class="badge b-wait">진행 중</span>
-        </div>
-        <div class="rc-detail">제주시 상하수도사업소 · 2026.05.31 신고 · 현장 조사 중</div>
-        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:40%"></div></div>
-      </div>
-      <div style="padding-bottom:16px"></div>
-    </div>
-
-    <!-- 행정 기록 -->
-    <div class="screen" id="screen-history">
-      <div class="section-label">🔐 행정 처리 기록 (PDV 저장)</div>
-      <div class="civil-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-          <div class="civil-title">주민등록등본 발급</div>
-          <span class="badge b-ok">완료</span>
-        </div>
-        <div class="civil-detail">2026.05.31 · 정부24 · 금융 기관 제출용</div>
-      </div>
-      <div class="civil-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-          <div class="civil-title">식품 영업 허가 신청</div>
-          <span class="badge b-proc">심사 중</span>
-        </div>
-        <div class="civil-detail">2026.05.20 · 제주시 위생과</div>
-      </div>
-      <div class="civil-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-          <div class="civil-title">납세증명서 발급</div>
-          <span class="badge b-ok">완료</span>
-        </div>
-        <div class="civil-detail">2026.05.15 · 국세청 · 입찰 서류</div>
-      </div>
-      <div style="padding-bottom:16px"></div>
-    </div>
-
-  </div>
-
-  <!-- AI 공무원 채팅 -->
+  <!-- 채팅 화면 -->
   <div class="chat-screen" id="chat-screen">
-    <div class="chat-header">
-      <button class="chat-back" onclick="hideChatScreen()">← 닫기</button>
-      <div class="chat-avatar"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg></div>
-      <div>
-        <div class="chat-header-name">K-Public AI 공무원</div>
-        <div class="chat-header-status">24시간 응답 · PDV 연동</div>
-      </div>
-    </div>
     <div class="chat-body" id="mob-chat-body">
-      <div class="b-ai">안녕하세요! K-Public AI 공무원입니다. 🏛️<br><br>등본 발급, 허가 신청, 시설 신고, 복지 안내, 지역 예산 조회 — 어떤 행정 업무든 말씀해 주세요. 대신 처리합니다.<br><br><em style="font-size:12px;color:var(--txt3)">※ 모든 처리 결과는 PDV에 저장됩니다</em></div>
-      <div class="quick-row">
-        <button class="qb" onclick="qs('등본 발급해 줘')">📋 등본</button>
-        <button class="qb" onclick="qs('영업 허가 신청해 줘')">🍽️ 허가</button>
-        <button class="qb" onclick="qs('우리 동네 예산 알려줘')">📊 예산</button>
-        <button class="qb" onclick="qs('도로 파손 신고해 줘')">🚧 신고</button>
-        <button class="qb" onclick="qs('복지 지원금 알려줘')">💰 복지</button>
-        <button class="qb" onclick="qs('세금 조회해 줘')">💳 세금</button>
+
+      <!-- 인트로 -->
+      <div class="intro-section" id="intro-section">
+        <div class="intro-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
+        </div>
+        <div>
+          <div class="intro-title">K-Public AI 공무원</div>
+          <div class="intro-sub" style="margin-top:6px">등본 발급 · 허가 신청 · 신고 · 복지 안내<br>어떤 행정 업무든 말씀해 주세요.</div>
+        </div>
+        <div class="chip-row">
+          <button class="chip" onclick="qs('주민등록등본 발급해 줘')">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            등본 발급
+          </button>
+          <button class="chip" onclick="qs('영업 허가 신청해 줘')">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            영업 허가
+          </button>
+          <button class="chip" onclick="qs('우리 동네 예산 알려줘')">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            지역 예산
+          </button>
+          <button class="chip" onclick="qs('받을 수 있는 복지 지원금 알려줘')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            복지 안내
+          </button>
+          <button class="chip" onclick="qs('자동차세 납부 조회해 줘')">
+            <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            세금 조회
+          </button>
+        </div>
       </div>
+
     </div>
+
+    <!-- 입력 영역 -->
     <div class="chat-input-area">
       <textarea class="chat-textarea" id="mob-input" rows="1"
-        placeholder="행정 업무를 말씀해 주세요…"
+        placeholder="메시지를 입력하세요…"
         oninput="autoResize(this);updateSendBtn()"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();mobSend()}"></textarea>
       <button class="chat-mic-btn" id="mob-mic-btn" onclick="toggleMic()">
         <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
       </button>
       <button class="chat-send-btn" id="mob-send-btn" onclick="mobSend()" disabled>
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
     </div>
   </div>
 
-  <div class="tab-bar" id="tab-bar">
-    <button class="tab-item active" onclick="showScreen('home',this)"><div class="tab-icon">🏠</div>홈</button>
-    <button class="tab-item" onclick="showChatScreen()"><div class="tab-icon">🏛️</div>AI공무원</button>
-    <button class="tab-item" onclick="showScreen('localinfo',this)"><div class="tab-icon">📊</div>지역정보</button>
-    <button class="tab-item" onclick="showScreen('report',this)"><div class="tab-icon">📣</div>신고</button>
-    <button class="tab-item" onclick="showScreen('history',this)"><div class="tab-icon">🔐</div>기록</button>
-  </div>
 </div>
-
 <div class="toast" id="mob-toast"></div>
 
 <script>
@@ -347,7 +246,7 @@ async function loadSystemPrompt() {
   return CFG.systemPrompt;
 }
 
-// ── AI 호출 — Proxy(DeepSeek) + Claude 폴백 ───────────────────
+// ── AI 호출 ───────────────────────────────────────────────────
 async function callAI(messages) {
   const sp = await loadSystemPrompt();
   try {
@@ -371,45 +270,25 @@ async function callAI(messages) {
   }
 }
 
-// ── UI 헬퍼 — autoResize / updateSendBtn ──────────────────────
+// ── UI 헬퍼 ───────────────────────────────────────────────────
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
 }
 function updateSendBtn() {
-  const inp = document.getElementById('mob-input');
   const btn = document.getElementById('mob-send-btn');
-  if (btn) btn.disabled = !inp.value.trim();
+  if (btn) btn.disabled = !document.getElementById('mob-input').value.trim();
 }
 
-// ── 화면 전환 ─────────────────────────────────────────────────
+// ── 채팅 ──────────────────────────────────────────────────────
 let hist = [];
-function showScreen(id, tabEl) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const s = document.getElementById('screen-' + id);
-  if (s) s.classList.add('active');
-  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  if (tabEl) tabEl.classList.add('active');
-  document.getElementById('content-area').scrollTop = 0;
-  document.getElementById('chat-screen').classList.remove('active');
-  document.getElementById('tab-bar').style.display = 'flex';
-}
-function showChatScreen() {
-  document.getElementById('chat-screen').classList.add('active');
-  document.getElementById('tab-bar').style.display = 'none';
-  // ★ focus() 미호출 — 안드로이드 소프트 키보드 강제 팝업 방지 (§3.6)
-}
-function hideChatScreen() {
-  document.getElementById('chat-screen').classList.remove('active');
-  document.getElementById('tab-bar').style.display = 'flex';
+let mc = 0;
+
+function hideIntro() {
+  const intro = document.getElementById('intro-section');
+  if (intro) intro.style.display = 'none';
 }
 
-function mobSearchLocal() {
-  const area = document.getElementById('mob-area').value.trim();
-  toast(`📊 ${area || '우리 동네'} 공공 정보를 조회합니다…`);
-}
-
-// ── 채팅 전송 ─────────────────────────────────────────────────
 async function mobSend() {
   const inp = document.getElementById('mob-input');
   const msg = inp.value.trim();
@@ -417,6 +296,7 @@ async function mobSend() {
   inp.value = '';
   autoResize(inp);
   updateSendBtn();
+  hideIntro();
   addMob(msg, 'user');
   hist.push({ role:'user', content:msg });
   const btn = document.getElementById('mob-send-btn');
@@ -427,60 +307,30 @@ async function mobSend() {
     document.getElementById(tid)?.remove();
     addMob(txt, 'ai');
     hist.push({ role:'assistant', content:txt });
-    _recordPdv(msg, txt);
+    _recordPdv(msg);
   } catch {
     document.getElementById(tid)?.remove();
-    addMob('오류가 발생했습니다.', 'ai');
+    addMob('오류가 발생했습니다. 다시 시도해 주세요.', 'ai');
   }
   btn.disabled = false;
 }
 
-// ── PDV 표준 payload { user_guid, source, report: { pdv_6w } }
-function _recordPdv(userMsg, aiReply) {
-  try {
-    const token = JSON.parse(sessionStorage.getItem('gopang_sso_token') || '{}');
-    const user_guid = token.ipv6 || 'anonymous';
-    const payload = {
-      user_guid,
-      source: 'kpublic',
-      report: {
-        pdv_6w: {
-          who:   user_guid,
-          when:  new Date().toISOString(),
-          where: window._gopangLocation || '위치 미확인',
-          what:  'K-Public AI 공무원 채팅',
-          how:   `민원: ${userMsg.slice(0, 60)}`,
-          why:   '공공 행정 처리 대행',
-        },
-      },
-    };
-    fetch(`${PROXY}/pdv_log`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }).catch(() => {});
-  } catch(e) { console.warn('[PDV]', e.message); }
-}
-
-let mc = 0;
 function addMob(text, type) {
   const id = 'mb' + (mc++);
   const body = document.getElementById('mob-chat-body');
   const d = document.createElement('div');
-  d.id = id; d.className = type === 'user' ? 'b-user' : 'b-ai';
+  d.id = id;
+  d.className = type === 'user' ? 'b-user' : 'b-ai';
   d.innerHTML = text.replace(/\n/g, '<br>');
-  body.appendChild(d); body.scrollTop = 99999; return id;
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
+  return id;
 }
 
 function qs(s) {
-  showChatScreen();
-  setTimeout(() => {
-    const inp = document.getElementById('mob-input');
-    inp.value = s;
-    autoResize(inp);
-    updateSendBtn();
-    mobSend();
-  }, 80);
+  document.getElementById('mob-input').value = s;
+  updateSendBtn();
+  mobSend();
 }
 
 function toast(msg) {
@@ -489,7 +339,33 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ── ctx 파라미터 — ctx_enc=b64 분기 ──────────────────────────
+// ── PDV 표준 payload ───────────────────────────────────────────
+function _recordPdv(userMsg) {
+  try {
+    const token = JSON.parse(sessionStorage.getItem('gopang_sso_token') || '{}');
+    const user_guid = token.ipv6 || 'anonymous';
+    fetch(`${PROXY}/pdv_log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_guid,
+        source: 'kpublic',
+        report: {
+          pdv_6w: {
+            who:   user_guid,
+            when:  new Date().toISOString(),
+            where: window._gopangLocation || '위치 미확인',
+            what:  'K-Public AI 공무원 채팅',
+            how:   `민원: ${userMsg.slice(0, 60)}`,
+            why:   '공공 행정 처리 대행',
+          },
+        },
+      }),
+    }).catch(() => {});
+  } catch(e) { console.warn('[PDV]', e.message); }
+}
+
+// ── ctx_enc=b64 분기 ─────────────────────────────────────────
 (function initCtx() {
   const params = new URLSearchParams(location.search);
   const ctxRaw = params.get('ctx') || '';
@@ -499,48 +375,32 @@ function toast(msg) {
         ? decodeURIComponent(escape(atob(ctxRaw)))
         : decodeURIComponent(ctxRaw))
     : null;
-  if (ctx) { showChatScreen(); setTimeout(() => qs(ctx), 300); }
+  if (ctx) setTimeout(() => qs(ctx), 300);
 })();
 
 // ── 마이크 — v3.6 패턴 ───────────────────────────────────────
-let micActive = false;
-let recognition = null;
-let mediaRecorder = null;
-let audioChunks = [];
+let micActive = false, recognition = null, mediaRecorder = null, audioChunks = [];
 
 function _micSetUI(active) {
   micActive = active;
-  const btn = document.getElementById('mob-mic-btn');
-  if (btn) btn.classList.toggle('active', active);
+  document.getElementById('mob-mic-btn')?.classList.toggle('active', active);
 }
 
 function _micStartWebSpeech(SR) {
   recognition = new SR();
-  recognition.lang           = 'ko-KR';
-  recognition.continuous     = false;
+  recognition.lang = 'ko-KR';
+  recognition.continuous = false;
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-
   recognition.onresult = (e) => {
     const t = e.results[0][0].transcript;
     const input = document.getElementById('mob-input');
-    if (input && t) {
-      input.value = t;
-      autoResize(input);   // ★ 직접 호출
-      updateSendBtn();     // ★ 직접 호출
-    }
+    if (input && t) { input.value = t; autoResize(input); updateSendBtn(); }
     _micSetUI(false);
     setTimeout(mobSend, 100);
   };
-
-  recognition.onerror = (e) => {
-    _micSetUI(false);
-    console.warn('[Mic] 오류:', e.error);
-    if (e.error !== 'aborted') toast('🎤 음성 인식 오류: ' + e.error);
-  };
-
+  recognition.onerror = (e) => { _micSetUI(false); if (e.error !== 'aborted') toast('🎤 음성 인식 오류: ' + e.error); };
   recognition.onend = () => { _micSetUI(false); };
-
   recognition.start();
   _micSetUI(true);
 }
@@ -551,53 +411,35 @@ async function _micStartMediaRecorder() {
     audioChunks = [];
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
-      _micSetUI(false);
-      toast('🎤 iOS에서는 텍스트로 입력해 주세요.');
-    };
+    mediaRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); _micSetUI(false); toast('🎤 iOS에서는 텍스트로 입력해 주세요.'); };
     mediaRecorder.start();
     _micSetUI(true);
-  } catch(e) {
-    _micSetUI(false);
-    toast('🎤 마이크 권한이 필요합니다.');
-  }
+  } catch { _micSetUI(false); toast('🎤 마이크 권한이 필요합니다.'); }
 }
 
 function toggleMic() {
   if (micActive) {
     if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
     if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-    _micSetUI(false);
-    return;
+    _micSetUI(false); return;
   }
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!isIOS && SR) {
-    _micStartWebSpeech(SR);
-  } else if (isIOS && window.MediaRecorder) {
-    _micStartMediaRecorder();
-  } else {
-    toast('🎤 이 브라우저에서는 음성 인식을 지원하지 않습니다.');
-  }
+  if (!isIOS && SR) _micStartWebSpeech(SR);
+  else if (isIOS && window.MediaRecorder) _micStartMediaRecorder();
+  else toast('🎤 이 브라우저에서는 음성 인식을 지원하지 않습니다.');
 }
 </script>
 
 <script>
-/* ── 고팡 SSO 인증 콜백 ─────────────────────────────────────── */
+/* ── 고팡 SSO 인증 콜백 ── */
 window._onGopangAuth = function(user) {
   if (!user) return;
   const badge = document.getElementById('auth-badge');
-  if (badge) {
-    badge.textContent = 'Lv.' + (user.level || 0);
-    badge.style.display = 'inline-block';
-  }
-  try {
-    sessionStorage.setItem('gopang_sso_token', JSON.stringify(user));
-  } catch(e) {}
+  if (badge) { badge.textContent = 'Lv.' + (user.level || 0); badge.style.display = 'inline-block'; }
+  try { sessionStorage.setItem('gopang_sso_token', JSON.stringify(user)); } catch(e) {}
   console.log('[K-Public] ✅ 인증 완료 —', user.level, user.ipv6?.slice(-8));
 };
 </script>
 </body>
 </html>
-
