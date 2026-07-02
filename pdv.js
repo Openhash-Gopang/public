@@ -87,7 +87,7 @@ const PDV = {
       content_hash: await _hashReport({ id, userMsg, requestType, now }),
       who:  { ipv6, role: 'citizen', recipients: ['gopang-pdv'] },
       when: { generated_at: now, period_start: now, period_end: now },
-      where: { svc_url: 'https://public.gopang.net', label: 'K-Public AI 공무원 상담' },
+      where: { svc_url: 'https://public.hondi.net', label: 'K-Public AI 공무원 상담' },
       what: {
         summary:      userMsg.slice(0, 200) || `행정 상담: ${requestType}`,
         request_type: requestType,
@@ -114,7 +114,7 @@ const PDV = {
       content_hash: await _hashReport({ id, docType, agency, refNo, now }),
       who:  { ipv6, role: 'citizen', recipients: ['gopang-pdv'] },
       when: { generated_at: now, period_start: now, period_end: now },
-      where: { svc_url: 'https://public.gopang.net', label: agency },
+      where: { svc_url: 'https://public.hondi.net', label: agency },
       what: {
         summary:  `민원 서류 발급: ${docType} — ${purpose}`,
         doc_type: docType,
@@ -144,7 +144,7 @@ const PDV = {
       content_hash: await _hashReport({ id, permitType, agency, refNo, now }),
       who:  { ipv6, role: 'citizen', recipients: ['gopang-pdv'] },
       when: { generated_at: now, period_start: now, period_end: now },
-      where: { svc_url: 'https://public.gopang.net', label: agency },
+      where: { svc_url: 'https://public.hondi.net', label: agency },
       what: {
         summary:     `인허가 신청: ${permitType} — ${description.slice(0, 100)}`,
         permit_type: permitType,
@@ -175,7 +175,7 @@ const PDV = {
       content_hash: await _hashReport({ id, reportType, location, now }),
       who:  { ipv6, role: 'citizen', recipients: ['gopang-pdv'] },
       when: { generated_at: now, period_start: now, period_end: now },
-      where: { svc_url: 'https://public.gopang.net', label: location },
+      where: { svc_url: 'https://public.hondi.net', label: location },
       what: {
         summary:     `시설 신고: ${reportType} — ${location}`,
         report_type: reportType,
@@ -205,7 +205,7 @@ const PDV = {
       content_hash: await _hashReport({ id, serviceName, agency, refNo, now }),
       who:  { ipv6, role: 'citizen', recipients: ['gopang-pdv'] },
       when: { generated_at: now, period_start: now, period_end: now },
-      where: { svc_url: 'https://public.gopang.net', label: agency },
+      where: { svc_url: 'https://public.hondi.net', label: agency },
       what: {
         summary:      `복지 신청: ${serviceName} — ${amount}`,
         service_name: serviceName,
@@ -236,7 +236,7 @@ const PDV = {
       content_hash: await _hashReport({ id, taxType, amount, refNo, now }),
       who:  { ipv6, role: 'citizen', recipients: ['gopang-pdv'] },
       when: { generated_at: now, period_start: now, period_end: now },
-      where: { svc_url: 'https://public.gopang.net', label: agency },
+      where: { svc_url: 'https://public.hondi.net', label: agency },
       what: {
         summary:  `세금·과태료: ${taxType} — ${amount.toLocaleString()}원`,
         tax_type: taxType,
