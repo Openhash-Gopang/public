@@ -484,13 +484,42 @@ async function _fetchKPublicCommonClient() {
   return ''; // 실패해도 agencyPrompt만으로 서비스 지속
 }
 
+// 2026-07-07: BYOK 경로도 무료 경로(/gov/relay, 서버 강제 주입)와 동일하게
+// UNIVERSAL-INTEGRITY+UNIVERSAL-common을 상속해야 한다(SP-CATALOG_v1_0.md
+// §① 감사에서 발견 — 지금까지는 K-Public_common만 붙고 이 레이어는
+// 빠져 있었다). /llm/relay는 서버 강제 주입이 없으므로 K-Public_common과
+// 동일하게 클라이언트에서 직접 fetch해 붙인다.
+const UNIVERSAL_INTEGRITY_RAW_URL = 'https://raw.githubusercontent.com/Openhash-Gopang/gopang/main/prompts/UNIVERSAL-INTEGRITY_v1_0.md';
+const UNIVERSAL_COMMON_RAW_URL    = 'https://raw.githubusercontent.com/Openhash-Gopang/gopang/main/prompts/UNIVERSAL-common_v1_1.md';
+let _universalLayerClientCache = null;
+async function _fetchUniversalLayerClient() {
+  if (_universalLayerClientCache !== null) return _universalLayerClientCache;
+  try {
+    const [ri, rc] = await Promise.all([
+      fetch(UNIVERSAL_INTEGRITY_RAW_URL, { cache: 'no-cache' }),
+      fetch(UNIVERSAL_COMMON_RAW_URL,    { cache: 'no-cache' }),
+    ]);
+    const parts = [];
+    if (ri.ok) parts.push(await ri.text());
+    if (rc.ok) parts.push(await rc.text());
+    _universalLayerClientCache = parts.join('\n\n---\n\n');
+  } catch(e) {
+    console.warn('[BYOK] UNIVERSAL 레이어 로드 실패:', e.message);
+    _universalLayerClientCache = '';
+  }
+  return _universalLayerClientCache;
+}
+
 async function _govCallRaw(messages, opts = {}) {
   const { maxTokens = 1000, stream = false, onChunk = null } = opts;
 
   const byok = _activeByok();
   if (byok) {
-    const kPublicCommon = await _fetchKPublicCommonClient();
-    const systemContent = kPublicCommon ? `${kPublicCommon}\n\n---\n\n${AGENCY_PROMPT}` : AGENCY_PROMPT;
+    const [universalLayer, kPublicCommon] = await Promise.all([
+      _fetchUniversalLayerClient(), _fetchKPublicCommonClient(),
+    ]);
+    const systemLayers  = [universalLayer, kPublicCommon, AGENCY_PROMPT].filter(Boolean);
+    const systemContent = systemLayers.join('\n\n---\n\n');
     try {
       return await _llmRelayCall(byok, [{ role:'system', content: systemContent }, ...messages], { maxTokens, stream, onChunk });
     } catch(e) {
