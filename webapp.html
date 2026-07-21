@@ -11,6 +11,16 @@
 <!-- ── 고팡 공통 인증 (subsystem-auth) ── -->
 <script type="module" src="https://hondi.net/auth/subsystem-auth.js"></script>
 
+<!-- ── 지방행정 위임 시 관할 특정용 도코드 판별 (2026-07-21 신설) ──
+     K-Public이 상담 중 "이건 도청/국가기관 문제"로 판단해 gov_do/
+     gov_national로 위임할 때, 서버가 도코드를 모르면 항상 "정보없음"
+     으로만 응답한다(위임 경로 사고실험으로 확인) — SP 조립 없이
+     도코드만 가볍게 판별하는 함수만 가져온다. -->
+<script type="module">
+import { guessProvinceCode } from 'https://hondi.net/src/gopang/gov/gov-router.js';
+window._guessProvinceCode = guessProvinceCode;
+</script>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root {
@@ -510,6 +520,59 @@ async function _fetchUniversalLayerClient() {
   return _universalLayerClientCache;
 }
 
+// ── GPS/PDV 위치감지 (2026-07-21 신설) ──────────────────────────
+// jeju/webapp.html의 패턴을 재사용하되, "제주 밖이면 버림" 필터는
+// 뺀다 — K-Public은 전국 서비스라 어느 지역 좌표든 유효한 힌트다.
+let _gpsLocationCache = null;
+let _gpsAttempted = false;
+async function _detectGpsLocationText() {
+  if (_gpsAttempted) return _gpsLocationCache;
+  _gpsAttempted = true;
+  if (!navigator.geolocation) return null;
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 6000, maximumAge: 300000 });
+    });
+    const { latitude: lat, longitude: lng } = pos.coords;
+    const r = await fetch(`${PROXY}/geocode?lat=${lat}&lng=${lng}`);
+    if (!r.ok) throw new Error('geocode ' + r.status);
+    const d = await r.json();
+    const doc = d.documents?.[0];
+    if (!doc) return null;
+    const region1 = doc.road_address?.region_1depth_name || doc.address?.region_1depth_name;
+    const region2 = doc.road_address?.region_2depth_name || doc.address?.region_2depth_name;
+    if (!region1) return null;
+    _gpsLocationCache = `${region1} ${region2 || ''}`.trim();
+    return _gpsLocationCache;
+  } catch (e) {
+    console.warn('[K-Public] GPS 위치 확인 실패(권한 거부·타임아웃 등):', e.message);
+    return null;
+  }
+}
+
+// PDV 거주지 힌트(GPS 실패 시 폴백) — jeju/webapp.html과 동일 로직.
+function _pdvLocationHint() {
+  try {
+    const p = JSON.parse(localStorage.getItem('gopang_user_v4') || sessionStorage.getItem('gopang_user_v4') || 'null');
+    return p?.address || p?.location || null;
+  } catch { return null; }
+}
+
+// 사용자 발화·GPS·PDV로 도코드를 판별한다(SP 조립 없이 가벼움). 실패해도
+// 예외를 던지지 않고 null로 안전하게 대체 — 이 기능이 죽어도 기존 K-Public
+// 상담 흐름에 영향 없음.
+async function _resolveProvinceCodeForDelegation(messages) {
+  try {
+    if (!window._guessProvinceCode) return null;
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    const locationHint = (await _detectGpsLocationText()) || _pdvLocationHint();
+    return await window._guessProvinceCode(lastUserMsg?.content || '', locationHint);
+  } catch (e) {
+    console.warn('[K-Public] provinceCode 판별 실패(무시):', e.message);
+    return null;
+  }
+}
+
 async function _govCallRaw(messages, opts = {}) {
   const { maxTokens = 1000, stream = false, onChunk = null } = opts;
 
@@ -527,12 +590,18 @@ async function _govCallRaw(messages, opts = {}) {
     }
   }
 
+  // provinceCode(2026-07-21 신설) — K-Public 상담 중 LLM이 gov_do/
+  // gov_national로 위임(sp_call)할 경우에 대비해 항상 실어 보낸다.
+  // 위임이 안 일어나는 일반 K-Public 응답에는 서버가 이 필드를
+  // 무시하므로 부작용이 없다.
+  const provinceCode = await _resolveProvinceCodeForDelegation(messages);
+
   const resp = await fetch(GOV_RELAY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       guid: _govGuid(), agency: AGENCY_ID, agencyPrompt: AGENCY_PROMPT,
-      messages, max_tokens: maxTokens, stream, tier: GOV_TIER,
+      messages, max_tokens: maxTokens, stream, tier: GOV_TIER, provinceCode,
     })
   });
 
