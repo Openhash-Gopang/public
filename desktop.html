@@ -369,14 +369,12 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
   <div style="overflow-y:auto;height:100%">
 
     <div class="hero">
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        전국 행정 기관 연계 · 고팡 AI 생태계
+      <div class="hero-badge" style="animation:none">
+        고팡 AI 생태계 · AI 행정 상담 (개발 중인 기능 다수 포함)
       </div>
-      <h1>"등본 발급해 줘."<br><span class="hl">말 한 마디로 끝나는 행정</span></h1>
+      <h1>행정 정보와<br><span class="hl">절차를 AI에게 물어보세요</span></h1>
       <p class="hero-sub">
-        민원 발급·인허가·시설 신고·복지 신청·지역 정보 조회 —
-        AI 공무원이 24시간 대신 처리하고, 결과를 PDV에 기록합니다
+        민원 발급·인허가·시설 신고·복지 신청 절차를 AI 채팅으로 안내받을 수 있습니다(실제 동작). 서류 자동 작성·기관 전자제출·처리 추적 등은 아직 개발되지 않았습니다.
       </p>
       <div class="hero-cta">
         <button class="btn-hero" onclick="show('chat',null)">
@@ -388,41 +386,40 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
         </button>
       </div>
       <div class="hero-stats">
-        <div class="hstat"><span class="hstat-num">24<span class="u">시간</span></span><span class="hstat-lbl">365일 민원 처리</span></div>
-        <div class="hstat"><span class="hstat-num">∞<span class="u"></span></span><span class="hstat-lbl">대기 없는 행정 서비스</span></div>
-        <div class="hstat"><span class="hstat-num">100<span class="u">%</span></span><span class="hstat-lbl">PDV 투명 행정 기록</span></div>
-        <div class="hstat"><span class="hstat-num">0<span class="u">원</span></span><span class="hstat-lbl">AI 공무원 이용료</span></div>
+        <div class="hstat"><span class="hstat-num">24<span class="u">시간</span></span><span class="hstat-lbl">AI 상담 응답 (실제 동작)</span></div>
+        <div class="hstat"><span class="hstat-num">?<span class="u"></span></span><span class="hstat-lbl">대행 처리 — 검증된 수치 없음</span></div>
+        <div class="hstat"><span class="hstat-num">?<span class="u"></span></span><span class="hstat-lbl">PDV 행정 기록 — 개발 중</span></div>
+        <div class="hstat"><span class="hstat-num">0<span class="u">원</span></span><span class="hstat-lbl">이용료</span></div>
       </div>
     </div>
 
     <!-- 비교표 -->
     <div class="compare-sec" id="compare-anchor">
       <div class="inner">
-        <div class="sec-badge">현실 정부 vs K-Public</div>
-        <h2 class="sec-title">AI 평행 정부는 이렇게 다릅니다</h2>
-        <p class="sec-sub">줄 서고, 서류 떼고, 다시 방문하는 행정을 말 한 마디로 해결합니다.</p>
+        <div class="sec-badge">현재 상태 vs 목표</div>
+        <h2 class="sec-title">무엇이 실제로 되고, 무엇이 목표인가요?</h2>
+        <p class="sec-sub">K-Public이 지향하는 방향과, 지금 실제로 쓸 수 있는 기능을 구분해 정리합니다.</p>
         <table class="compare-table">
           <thead>
             <tr>
-              <th style="text-align:left;background:#f8f9fa">비교 항목</th>
-              <th class="th-old">현실 정부</th>
-              <th class="th-new">K-Public AI 공무원</th>
+              <th style="text-align:left;background:#f8f9fa">항목</th>
+              <th class="th-old">현재 상태</th>
+              <th class="th-new">목표(K-Public)</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>운영 시간</td><td>평일 09:00–18:00</td><td><strong>24시간 365일</strong></td></tr>
-            <tr><td>민원 처리 방식</td><td>직접 방문 또는 온라인 직접 입력</td><td>말 한 마디 → <strong>AI가 대신 처리</strong></td></tr>
-            <tr><td>서류 작성</td><td>시민이 직접 작성</td><td>PDV 정보 기반 <strong>자동 작성·제출</strong></td></tr>
-            <tr><td>처리 현황 파악</td><td>전화 문의 또는 재방문</td><td><strong>실시간 단계별 보고</strong></td></tr>
-            <tr><td>지역 예산·사업 정보</td><td>공보 또는 직접 문의</td><td>공공 데이터 <strong>실시간 조회·요약</strong></td></tr>
-            <tr><td>시설 신고 처리</td><td>신고 후 처리 여부 불투명</td><td>신고 즉시 <strong>담당 부서 배정·추적</strong></td></tr>
-            <tr><td>복지 서비스 안내</td><td>시민이 직접 검색</td><td>PDV 정보 기반 <strong>맞춤 복지 자동 안내</strong></td></tr>
-            <tr><td>행정 기록 보관</td><td>기관 서버 (열람 제한)</td><td>시민 본인 <strong>PDV에 암호화 저장</strong></td></tr>
-            <tr><td>부패·비효율</td><td>담당자 개인 편차 존재</td><td>AI 처리 → <strong>편차·부패 원천 차단</strong></td></tr>
+            <tr><td>행정 절차 AI 상담</td><td colspan="2" style="text-align:center;color:var(--sky-dk);font-weight:600">실제 동작 — 채팅으로 24시간 이용 가능</td></tr>
+            <tr><td>민원 처리 방식</td><td>개발되지 않음</td><td>말 한마디로 AI가 대신 처리</td></tr>
+            <tr><td>서류 작성</td><td>개발되지 않음</td><td>PDV 정보 기반 자동 작성·제출</td></tr>
+            <tr><td>처리 현황 파악</td><td>개발되지 않음</td><td>실시간 단계별 보고</td></tr>
+            <tr><td>지역 예산·사업 정보</td><td>AI 채팅으로 일반 안내 가능(실시간 공공데이터 연동 아님)</td><td>공공 데이터 포털 실시간 조회·요약</td></tr>
+            <tr><td>시설 신고 처리</td><td>개발되지 않음</td><td>신고 즉시 담당 부서 배정·추적</td></tr>
+            <tr><td>복지 서비스 안내</td><td>개발되지 않음</td><td>PDV 정보 기반 맞춤 복지 자동 안내</td></tr>
+            <tr><td>행정 기록 보관</td><td>개발되지 않음</td><td>시민 본인 PDV에 암호화 저장</td></tr>
             <tr style="background:linear-gradient(90deg,#f0f9ff,#f5f3ff)">
               <td style="font-weight:700;color:#0f172a">행정 투명성</td>
-              <td>내부 결정 불투명</td>
-              <td style="font-weight:700;color:#0f172a">전 과정 PDV 기록 → <strong>위변조 불가 행정 이력</strong><br><small style="font-weight:400;color:var(--sky-dk)">→ K-Public만의 고유한 강점</small></td>
+              <td>개발되지 않음</td>
+              <td style="font-weight:700;color:#0f172a">전 과정 PDV 기록 → <strong>위변조 불가 행정 이력</strong><br><small style="font-weight:400;color:var(--sky-dk)">→ 목표 — 아직 개발되지 않음</small></td>
             </tr>
           </tbody>
         </table>
@@ -443,17 +440,16 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
                 <svg viewBox="0 0 24 24" style="width:26px;height:26px"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/></svg>
               </div>
               <div style="flex:1">
-                <div style="font-size:11px;font-weight:700;color:var(--sky-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">K-Public 핵심 우위</div>
+                <div style="font-size:11px;font-weight:700;color:var(--sky-dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">K-Public이 지향하는 방향</div>
                 <h3 style="font-size:19px;margin-bottom:10px;color:#0f172a">광범위한 행정 지식 + 전 생애 PDV 기록</h3>
                 <p style="font-size:13.5px;color:#374151;line-height:1.8">
-                  K-Public AI 공무원은 두 가지를 동시에 갖춥니다. 첫째, 전국의 법령·조례·행정 절차를 웹 검색과 공공 데이터 포털을 통해 <strong>실시간으로 파악</strong>합니다. 어떤 담당 공무원도 모든 법령과 조례를 혼자 알 수는 없지만, AI 공무원은 즉시 확인합니다. 둘째, 시민의 고팡 PDV에 저장된 <strong>과거 행정 처리 이력·가족 정보·주소 이력</strong>을 동의 하에 참조하여 서류를 자동 작성합니다.<br><br>
-                  시민은 복잡한 서류를 채울 필요가 없습니다. 요청만 하면 됩니다. <strong>이것이 K-Public만이 제공할 수 있는 고유한 가치입니다.</strong>
+                  K-Public이 목표로 하는 건 두 가지의 결합입니다. 첫째, AI 채팅을 통한 행정 절차 안내(실제 동작 — 다만 특정 공공데이터 포털을 실시간 조회하는 기능은 아닙니다, AI가 학습한 지식과 필요 시 웹 검색으로 답합니다). 둘째, PDV에 저장된 정보를 참조해 서류를 자동 작성하는 기능(개발 중).<br><br>
+                  <strong>지금 실제로 할 수 있는 건 절차·법령에 대한 AI 상담입니다.</strong> 서류 자동 작성·기관 제출·처리 추적은 목표이며 아직 개발되지 않았습니다.
                 </p>
                 <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">📜 법령·조례 실시간 참조</span>
-                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">🔐 PDV 기반 서류 자동 작성</span>
-                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">📊 공공 데이터 포털 연동</span>
-                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">🏛️ 전국 행정 기관 연계</span>
+                  <span style="background:#fff;border:1px solid var(--sky-bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--sky-dk)">💬 AI 채팅 행정 상담 (실제 동작)</span>
+                  <span style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#6b7280">🔐 PDV 기반 서류 자동 작성 (개발 중)</span>
+                  <span style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:#6b7280">🏛️ 정부 시스템 연계 (개발 중)</span>
                 </div>
               </div>
             </div>
@@ -463,54 +459,54 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
             <div class="feat-icon" style="background:var(--sky-bg);color:var(--sky-dk)">
               <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </div>
-            <h3>민원 서류 자동 발급</h3>
-            <p>등본·초본·인감·사업자등록증·납세증명 등 모든 민원 서류를 AI가 대신 신청·발급합니다. PDV에 저장된 정보로 서류를 자동 작성하며, 발급된 서류는 PDV에 보관됩니다.</p>
-            <div class="feat-source">📋 정부24·민원24 연계 · PDV 자동 작성 · 발급 즉시 PDV 저장</div>
+            <h3>민원 서류 자동 발급 (개발 중)</h3>
+            <p>등본·초본·인감 등 민원 서류를 AI가 대신 신청·발급하는 것이 목표입니다. 아직 개발되지 않았습니다 — 정부24·민원24 등 실제 정부 시스템과의 연동이 없습니다.</p>
+            <div class="feat-source">아직 개발되지 않았습니다.</div>
           </div>
 
           <div class="feat-card">
             <div class="feat-icon" style="background:var(--green-bg);color:#065f46">
               <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </div>
-            <h3>인허가 신청 대행</h3>
-            <p>건축 허가·식품 영업 허가·각종 신고를 AI가 대신 신청합니다. 필요 서류를 자동으로 파악하고 작성·제출하며, 처리 현황을 실시간으로 추적합니다.</p>
-            <div class="feat-source">🏗️ 건축법·식품위생법·각종 특별법 실시간 참조 · 필요 서류 자동 파악</div>
+            <h3>인허가 신청 대행 (개발 중)</h3>
+            <p>건축 허가·식품 영업 허가 등 신고를 AI가 대신 신청하는 것이 목표입니다. 아직 개발되지 않았습니다 — 관련 법령·절차에 대한 AI 상담은 가능합니다.</p>
+            <div class="feat-source">개발 중 — 절차 안내(상담)만 실제 동작</div>
           </div>
 
           <div class="feat-card">
             <div class="feat-icon" style="background:var(--orange-bg);color:var(--orange)">
               <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </div>
-            <h3>지역 정보 실시간 조회</h3>
-            <p>우리 동네 올해 공공 사업·예산·도로 정비 계획·가로수 현황을 공공 데이터 포털과 웹 검색으로 실시간 조회·요약합니다. 지역 의정 활동·조례도 쉬운 말로 안내합니다.</p>
-            <div class="feat-source">📊 공공 데이터 포털 · 지방재정 공개 시스템 · 국토정보 플랫폼 연동</div>
+            <h3>지역 정보 안내</h3>
+            <p>AI 채팅으로 지역 행정·조례 관련 질문에 답합니다(실제 동작). 공공 데이터 포털·지방재정 공개 시스템과의 실시간 자동 연동은 아직 개발되지 않았습니다.</p>
+            <div class="feat-source">💬 AI 채팅 상담 실제 동작 · 실시간 포털 연동은 개발 중</div>
           </div>
 
           <div class="feat-card">
             <div class="feat-icon" style="background:#f5f3ff;color:#7c3aed">
               <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
-            <h3>공공 시설 신고 & 추적</h3>
-            <p>도로 파손·상하수도 문제·가로등 고장·불법 주정차를 신고하면 담당 부서가 즉시 배정됩니다. 처리 현황을 실시간으로 추적하고 완료 시 PDV에 기록됩니다.</p>
-            <div class="feat-source">🔧 담당 부서 자동 배정 · 실시간 처리 추적 · 미처리 시 자동 에스컬레이션</div>
+            <h3>공공 시설 신고 & 추적 (개발 중)</h3>
+            <p>도로 파손·가로등 고장 등을 신고하면 담당 부서가 자동 배정되고 처리 현황을 추적하는 것이 목표입니다. 아직 개발되지 않았습니다.</p>
+            <div class="feat-source">아직 개발되지 않았습니다.</div>
           </div>
 
           <div class="feat-card">
             <div class="feat-icon" style="background:var(--sky-bg);color:var(--sky-dk)">
               <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
-            <h3>맞춤 복지 자동 안내</h3>
-            <p>PDV의 가족 정보·소득·주소를 분석하여 신청 가능한 복지·지원금을 자동으로 찾아줍니다. 신청 서류를 대신 작성하고 제출까지 대행합니다.</p>
-            <div class="feat-source">💰 복지로·사회보장정보원 연계 · 맞춤 혜택 자동 탐색 · 신청 대행</div>
+            <h3>맞춤 복지 안내 (개발 중)</h3>
+            <p>PDV의 가족·소득 정보를 분석해 신청 가능한 복지·지원금을 자동으로 찾아 신청까지 대행하는 것이 목표입니다. 아직 개발되지 않았습니다 — 복지로·사회보장정보원과의 실제 연동이 없습니다.</p>
+            <div class="feat-source">아직 개발되지 않았습니다.</div>
           </div>
 
           <div class="feat-card">
             <div class="feat-icon" style="background:#f1f5f9;color:#475569">
               <svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
-            <h3>행정 기록 PDV 보관</h3>
-            <p>모든 민원 처리 결과·발급 서류·행정 이력은 시민 본인의 PDV에 암호화 저장됩니다. 동일 민원 재신청 시 이전 기록을 자동 참조하며, 행정 투명성을 보장합니다.</p>
-            <div class="feat-source">🔐 AES-256-GCM 암호화 · OpenHash 불변 저장 · 전자정부법 준수</div>
+            <h3>행정 기록 PDV 보관 (개발 중)</h3>
+            <p>민원 처리 결과·발급 서류를 시민 본인의 PDV에 암호화 저장하는 것이 목표입니다. 아직 개발되지 않았습니다.</p>
+            <div class="feat-source">아직 개발되지 않았습니다.</div>
           </div>
 
         </div>
@@ -522,54 +518,54 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
       <div class="inner">
         <div class="sec-badge" style="background:rgba(3,105,161,.2);color:#7dd3fc">작동 방식</div>
         <h2 class="sec-title" style="color:#fff">K-Public은 어떻게 작동하나요?</h2>
-        <p class="sec-sub" style="color:#94a3b8">6단계 AI 행정 워크플로우 — 요청부터 결과 기록까지 자동화됩니다.</p>
+        <p class="sec-sub" style="color:#94a3b8">아래 1~2단계는 실제로 동작하며, 3~6단계는 목표로 하는 방향이며 아직 개발되지 않았습니다.</p>
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-body">
-              <h4>요청 입력</h4>
-              <p>말 또는 텍스트로 요청합니다. "등본 발급해 줘", "건축 허가 받아 줘", "우리 동네 올해 예산 알려줘" — 어떤 형식이든 됩니다. AI 공무원이 요청 유형을 자동 분류합니다.</p>
-              <span class="step-badge">자연어 요청 · 24시간 응답 · PDV 이력 자동 참조</span>
+              <h4>요청 입력 (실제 동작)</h4>
+              <p>말 또는 텍스트로 요청합니다. AI가 요청 내용을 이해하고 채팅으로 답합니다.</p>
+              <span class="step-badge">자연어 요청 · 24시간 응답 (실제 동작)</span>
             </div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
             <div class="step-body">
-              <h4>담당 기관 및 절차 파악</h4>
-              <p>웹 검색과 공공 데이터 포털을 통해 담당 기관·부서·최신 절차·필요 서류·처리 기간·수수료를 실시간으로 확인합니다. 법령이 개정되어도 항상 최신 정보를 제공합니다.</p>
-              <span class="step-badge">웹 검색 기반 최신 절차 · 법령 실시간 확인 · 담당 부서 자동 파악</span>
+              <h4>담당 기관 및 절차 안내 (실제 동작)</h4>
+              <p>AI가 학습한 지식과 필요 시 웹 검색을 통해 일반적인 절차·필요 서류를 안내합니다. 특정 공공데이터 포털을 실시간으로 조회하는 기능은 아직 개발되지 않았습니다 — 최신 절차는 반드시 해당 기관에 재확인하십시오.</p>
+              <span class="step-badge">AI 채팅 기반 절차 안내 (실제 동작)</span>
             </div>
           </div>
           <div class="step">
             <div class="step-num">3</div>
             <div class="step-body">
-              <h4>서류 자동 작성</h4>
-              <p>PDV에 저장된 시민 정보(주소·가족·소득·과거 이력)를 동의 하에 참조하여 필요 서류를 자동으로 작성합니다. 시민은 내용을 확인하고 동의만 하면 됩니다.</p>
-              <span class="step-badge">PDV 정보 자동 반영 · 시민 확인·동의 후 제출 · 오류 자동 검토</span>
+              <h4>서류 자동 작성 (개발 중)</h4>
+              <p>PDV 정보를 참조해 서류를 자동 작성하는 것이 목표입니다. 아직 개발되지 않았습니다.</p>
+              <span class="step-badge">개발 중</span>
             </div>
           </div>
           <div class="step">
             <div class="step-num">4</div>
             <div class="step-body">
-              <h4>기관 제출 및 추적</h4>
-              <p>확인된 서류를 해당 기관에 전자 제출합니다. 접수 번호를 받아 처리 현황을 실시간으로 추적하며, 단계별로 시민에게 보고합니다. 처리가 지연되면 자동으로 담당자에게 확인 요청합니다.</p>
-              <span class="step-badge">전자 제출 · 실시간 처리 추적 · 지연 시 자동 에스컬레이션</span>
+              <h4>기관 제출 및 추적 (개발 중)</h4>
+              <p>서류를 기관에 전자 제출하고 처리 현황을 추적하는 것이 목표입니다. 아직 개발되지 않았습니다 — 실제 정부 전자제출 시스템과의 연동이 없습니다.</p>
+              <span class="step-badge">개발 중</span>
             </div>
           </div>
           <div class="step">
             <div class="step-num">5</div>
             <div class="step-body">
-              <h4>결과 보고</h4>
-              <p>처리가 완료되면 결과를 시민에게 즉시 보고합니다. 발급된 서류·승인 결과·처리 내역을 정리하여 전달하며, 추가 조치가 필요한 경우 다음 단계를 안내합니다.</p>
-              <span class="step-badge">완료 즉시 보고 · 서류 전달 · 추가 조치 안내</span>
+              <h4>결과 보고 (개발 중)</h4>
+              <p>처리 완료 결과를 정리해 전달하는 것이 목표입니다. 아직 개발되지 않았습니다.</p>
+              <span class="step-badge">개발 중</span>
             </div>
           </div>
           <div class="step">
             <div class="step-num">6</div>
             <div class="step-body">
-              <h4>PDV 행정 기록 저장</h4>
-              <p>모든 처리 결과·발급 서류·행정 이력이 시민의 PDV에 암호화 저장됩니다. 향후 동일 민원 재신청 시 자동으로 참조되며, 행정 처리의 전 과정이 투명하게 기록됩니다.</p>
-              <span class="step-badge">전 과정 PDV 암호화 저장 · 재신청 시 자동 참조 · 행정 투명성 보장</span>
+              <h4>PDV 행정 기록 저장 (개발 중)</h4>
+              <p>처리 결과를 PDV에 암호화 저장하는 것이 목표입니다. 아직 개발되지 않았습니다.</p>
+              <span class="step-badge">개발 중</span>
             </div>
           </div>
         </div>
@@ -585,23 +581,23 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
         <div class="sec-grid">
           <div class="sec-card">
             <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-            <h4>OpenHash 불변 행정 원장</h4>
-            <p>모든 민원 처리 기록을 수학적으로 불변 저장 · 위변조 원천 차단 · 행정 부패 구조적 방지</p>
+            <h4>OpenHash 불변 원장 (설계 목표)</h4>
+            <p>실제로 기록되는 처리 이력은 위·변조가 차단되도록 설계되어 있습니다. 다만 아직 실제 민원 처리 자체가 개발되지 않아 이 보호는 향후 실 데이터에 적용될 예정입니다.</p>
           </div>
           <div class="sec-card">
             <svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <h4>AES-256-GCM 암호화</h4>
-            <p>행정 서류·처리 이력 전체 암호화 · 시민 본인만 열람 · 동의 없이 제3자 공유 불가</p>
+            <h4>암호화 (설계 목표)</h4>
+            <p>AES-256-GCM 기반 암호화를 목표로 설계되어 있습니다.</p>
           </div>
           <div class="sec-card">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             <h4>고팡 PDV 신원 기반</h4>
-            <p>시민의 고팡 PDV 신원으로만 행정 대행 · 본인 확인 후 처리 · 신원 도용 원천 차단</p>
+            <p>시민의 고팡 PDV 신원으로 본인 확인하는 것을 목표로 합니다. 실제 행정 대행 기능 자체가 아직 개발되지 않았습니다.</p>
           </div>
           <div class="sec-card">
             <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-            <h4>전자정부법·개인정보보호법</h4>
-            <p>전자정부법·행정 절차법·개인정보보호법 완전 준수 · AI 대행은 서류 작성·제출에 한정</p>
+            <h4>개인정보 보호 (목표)</h4>
+            <p>전자정부법·행정절차법·개인정보보호법 준수를 목표로 합니다. "완전 준수"라는 표현은 실제 검증 없이는 쓰지 않습니다.</p>
           </div>
         </div>
       </div>
@@ -611,7 +607,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="cta-sec">
       <div class="inner">
         <h2>지금 바로 AI 공무원에게 요청하세요</h2>
-        <p>고팡 계정이 있으면 즉시 시작할 수 있습니다.<br>줄 서지 않아도 됩니다. 서류를 채우지 않아도 됩니다.</p>
+        <p>고팡 계정이 있으면 즉시 시작할 수 있습니다.<br>행정 절차가 궁금할 때, AI에게 편하게 물어보세요.</p>
         <div class="hero-cta">
           <button class="btn-hero" onclick="show('chat',null)" style="font-size:16px;padding:16px 32px">
             <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -672,7 +668,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="ph">
       <div class="ph-badge">민원 발급</div>
       <div class="ph-title">민원 서류 발급 대행</div>
-      <div class="ph-sub">AI 공무원이 PDV 정보로 서류를 자동 작성하고 발급합니다. 발급된 서류는 PDV에 보관됩니다.</div>
+      <div class="ph-sub">서류 발급 절차를 AI 채팅으로 안내받을 수 있습니다(실제 동작). 자동 발급·PDV 보관은 아직 개발되지 않았습니다.</div>
     </div>
     <div class="panel-body">
       <div class="category-grid">
@@ -686,15 +682,9 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
         <div class="cat-card" onclick="qs('건축물대장 발급해 줘')"><span class="cat-icon">🏢</span><div class="cat-label">건축물대장</div><div class="cat-sub">즉시 발급</div></div>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-hd-t">📋 최근 발급 내역</span><button class="card-hd-a" onclick="show('history',null)">전체 보기 →</button></div>
+        <div class="card-hd"><span class="card-hd-t">📋 최근 발급 내역</span></div>
         <div class="card-bd">
-          <table class="data-table">
-            <thead><tr><th>발급일</th><th>서류명</th><th>용도</th><th>상태</th></tr></thead>
-            <tbody>
-              <tr><td>2026.05.31</td><td>주민등록등본</td><td>금융 기관 제출</td><td><span class="badge b-ok">발급 완료</span></td></tr>
-              <tr><td>2026.05.15</td><td>납세증명서</td><td>입찰 서류</td><td><span class="badge b-ok">발급 완료</span></td></tr>
-            </tbody>
-          </table>
+          <div style="padding:20px;text-align:center;color:var(--txt3);font-size:12.5px">서류 자동 발급 기능은 아직 개발되지 않았습니다. 발급 내역이 없습니다.</div>
         </div>
       </div>
     </div>
@@ -705,28 +695,21 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="ph">
       <div class="ph-badge">인허가 신청</div>
       <div class="ph-title">인허가·신고 대행</div>
-      <div class="ph-sub">AI 공무원이 최신 법령을 확인하고 필요 서류를 작성·제출합니다.</div>
+      <div class="ph-sub">인허가 절차를 AI 채팅으로 안내받을 수 있습니다(실제 동작). 자동 신청·제출은 아직 개발되지 않았습니다.</div>
     </div>
     <div class="panel-body">
       <div class="category-grid">
-        <div class="cat-card" onclick="qs('건축 허가 신청해 줘')"><span class="cat-icon">🏗️</span><div class="cat-label">건축 허가</div><div class="cat-sub">건축법 기반</div></div>
-        <div class="cat-card" onclick="qs('식품 영업 허가 신청해 줘')"><span class="cat-icon">🍽️</span><div class="cat-label">식품 영업 허가</div><div class="cat-sub">식품위생법</div></div>
-        <div class="cat-card" onclick="qs('위생 점검 신청해 줘')"><span class="cat-icon">🔬</span><div class="cat-label">위생 점검 신청</div><div class="cat-sub">보건소 연계</div></div>
-        <div class="cat-card" onclick="qs('사업자 등록 신청해 줘')"><span class="cat-icon">🏪</span><div class="cat-label">사업자 등록</div><div class="cat-sub">국세청 연계</div></div>
-        <div class="cat-card" onclick="qs('숙박업 허가 신청해 줘')"><span class="cat-icon">🏨</span><div class="cat-label">숙박업 허가</div><div class="cat-sub">공중위생법</div></div>
-        <div class="cat-card" onclick="qs('폐업 신고해 줘')"><span class="cat-icon">📦</span><div class="cat-label">폐업 신고</div><div class="cat-sub">즉시 처리</div></div>
+        <div class="cat-card" onclick="qs('건축 허가 신청해 줘')"><span class="cat-icon">🏗️</span><div class="cat-label">건축 허가</div><div class="cat-sub">절차 안내</div></div>
+        <div class="cat-card" onclick="qs('식품 영업 허가 신청해 줘')"><span class="cat-icon">🍽️</span><div class="cat-label">식품 영업 허가</div><div class="cat-sub">절차 안내</div></div>
+        <div class="cat-card" onclick="qs('위생 점검 신청해 줘')"><span class="cat-icon">🔬</span><div class="cat-label">위생 점검 신청</div><div class="cat-sub">절차 안내</div></div>
+        <div class="cat-card" onclick="qs('사업자 등록 신청해 줘')"><span class="cat-icon">🏪</span><div class="cat-label">사업자 등록</div><div class="cat-sub">절차 안내</div></div>
+        <div class="cat-card" onclick="qs('숙박업 허가 신청해 줘')"><span class="cat-icon">🏨</span><div class="cat-label">숙박업 허가</div><div class="cat-sub">절차 안내</div></div>
+        <div class="cat-card" onclick="qs('폐업 신고해 줘')"><span class="cat-icon">📦</span><div class="cat-label">폐업 신고</div><div class="cat-sub">절차 안내</div></div>
       </div>
       <div class="card">
         <div class="card-hd"><span class="card-hd-t">🔄 진행 중인 인허가</span></div>
         <div class="card-bd">
-          <table class="data-table">
-            <thead><tr><th>신청일</th><th>종류</th><th>담당 기관</th><th>진행률</th><th>상태</th></tr></thead>
-            <tbody>
-              <tr><td>2026.05.20</td><td>식품 영업 허가</td><td>제주시 위생과</td><td>
-                <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
-              </td><td><span class="badge b-proc">심사 중</span></td></tr>
-            </tbody>
-          </table>
+          <div style="padding:20px;text-align:center;color:var(--txt3);font-size:12.5px">인허가 신청 대행 기능은 아직 개발되지 않았습니다. 진행 중인 인허가가 없습니다.</div>
         </div>
       </div>
     </div>
@@ -759,18 +742,9 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
         </div>
       </div>
       <div class="card">
-        <div class="card-hd"><span class="card-hd-t">📊 제주시 한림읍 2026년 주요 공공 사업</span><span class="badge b-sky">공공 데이터 기준</span></div>
+        <div class="card-hd"><span class="card-hd-t">📊 지역 공공 사업 조회</span></div>
         <div class="card-bd">
-          <table class="data-table">
-            <thead><tr><th>사업명</th><th>예산</th><th>기간</th><th>상태</th></tr></thead>
-            <tbody>
-              <tr><td>한림로 도로 재포장</td><td>4.2억 원</td><td>2026.04–07</td><td><span class="badge b-proc">진행 중</span></td></tr>
-              <tr><td>한림 공원 가로수 정비</td><td>8,500만 원</td><td>2026.05–06</td><td><span class="badge b-ok">완료</span></td></tr>
-              <tr><td>귀덕리 상수도 교체</td><td>1.8억 원</td><td>2026.07–09</td><td><span class="badge b-wait">예정</span></td></tr>
-              <tr><td>한림항 주변 가로등 교체</td><td>3,200만 원</td><td>2026.06–07</td><td><span class="badge b-wait">예정</span></td></tr>
-            </tbody>
-          </table>
-          <div style="margin-top:10px;font-size:11px;color:var(--txt3)">📌 출처: 제주시 지방재정 공개 시스템 · 2026.05 기준 · AI 공무원이 실시간 조회</div>
+          <div style="padding:20px;text-align:center;color:var(--txt3);font-size:12.5px">공공 데이터 포털 실시간 연동은 아직 개발되지 않았습니다. "조회하기" 버튼 대신, AI 채팅으로 일반적인 지역 정보를 물어보실 수 있습니다.</div>
         </div>
       </div>
     </div>
@@ -781,7 +755,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="ph">
       <div class="ph-badge">공공 시설 신고</div>
       <div class="ph-title">시설 신고 & 처리 추적</div>
-      <div class="ph-sub">신고 즉시 담당 부서가 배정되고, 처리 현황을 실시간으로 추적합니다.</div>
+      <div class="ph-sub">시설 신고 절차를 AI 채팅으로 안내받을 수 있습니다(실제 동작). 자동 배정·처리 추적은 아직 개발되지 않았습니다.</div>
     </div>
     <div class="panel-body">
       <div class="category-grid" style="margin-bottom:16px">
@@ -795,26 +769,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
       <div class="card">
         <div class="card-hd"><span class="card-hd-t">📍 내 신고 현황</span></div>
         <div class="card-bd">
-          <div class="alert-row">
-            <div class="alert-dot" style="background:var(--green)"></div>
-            <div class="alert-info">
-              <div class="alert-t">한림로 234 앞 도로 파손 신고</div>
-              <div class="alert-d">제주시 도로관리과 배정 · 2026.05.29 신고</div>
-              <div style="margin-top:8px"><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
-              <div style="font-size:11px;color:var(--txt3);margin-top:3px">처리 완료 (2026.05.31)</div></div>
-            </div>
-            <span class="badge b-ok">완료</span>
-          </div>
-          <div class="alert-row">
-            <div class="alert-dot" style="background:var(--orange)"></div>
-            <div class="alert-info">
-              <div class="alert-t">귀덕리 상수도 누수 신고</div>
-              <div class="alert-d">제주시 상하수도사업소 배정 · 2026.05.31 신고</div>
-              <div style="margin-top:8px"><div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
-              <div style="font-size:11px;color:var(--txt3);margin-top:3px">현장 조사 중 · 예상 완료: 2026.06.03</div></div>
-            </div>
-            <span class="badge b-wait">진행 중</span>
-          </div>
+          <div style="padding:20px;text-align:center;color:var(--txt3);font-size:12.5px">시설 신고 자동 배정·추적 기능은 아직 개발되지 않았습니다. 신고 이력이 없습니다.</div>
         </div>
       </div>
     </div>
@@ -825,26 +780,20 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="ph">
       <div class="ph-badge">복지 & 지원금</div>
       <div class="ph-title">맞춤 복지 서비스 안내 & 신청</div>
-      <div class="ph-sub">PDV 정보를 분석하여 신청 가능한 복지·지원금을 자동으로 찾아드립니다.</div>
+      <div class="ph-sub">복지 제도에 대해 AI 채팅으로 안내받을 수 있습니다(실제 동작). PDV 기반 맞춤 탐색·자동 신청 대행은 아직 개발되지 않았습니다.</div>
     </div>
     <div class="panel-body">
       <div class="card" style="border:1.5px solid var(--sky);background:var(--sky-bg);margin-bottom:14px">
-        <div class="card-hd" style="border-bottom-color:var(--sky-bd)"><span class="card-hd-t">🎯 나에게 맞는 복지 자동 탐색</span><span class="badge b-sky">PDV 분석 기반</span></div>
+        <div class="card-hd" style="border-bottom-color:var(--sky-bd)"><span class="card-hd-t">🎯 복지 제도 안내</span><span class="badge" style="background:#fef3c7;color:#92400e">개발 중인 기능 포함</span></div>
         <div class="card-bd">
-          <div style="font-size:13px;color:var(--txt2);margin-bottom:12px">PDV에 저장된 가족 정보·소득·주소를 분석하여 신청 가능한 복지 혜택을 자동으로 찾습니다.</div>
-          <button class="f-btn-full" onclick="toast('🔍 PDV 정보를 분석하여 맞춤 복지를 탐색합니다…')">맞춤 복지 탐색하기</button>
+          <div style="font-size:13px;color:var(--txt2);margin-bottom:12px">PDV 정보를 분석해 맞춤 복지를 자동으로 찾아주는 기능은 아직 개발되지 않았습니다. 대신 AI 채팅에 상황을 설명하시면 일반적인 복지 제도를 안내해 드립니다.</div>
+          <button class="f-btn-full" onclick="qs('제가 신청할 수 있는 복지 혜택이 궁금합니다')">AI 채팅으로 물어보기</button>
         </div>
       </div>
       <div class="card">
         <div class="card-hd"><span class="card-hd-t">💰 신청 가능한 복지 혜택</span></div>
         <div class="card-bd">
-          <table class="data-table">
-            <thead><tr><th>서비스명</th><th>지원 금액</th><th>담당 기관</th><th>신청</th></tr></thead>
-            <tbody>
-              <tr><td>청년 월세 지원</td><td>월 20만 원 (12개월)</td><td>제주시 주거복지과</td><td><button class="f-btn-full" style="width:auto;padding:5px 12px;font-size:11px;margin:0" onclick="toast('📋 청년 월세 지원 신청을 대행합니다.')">신청 대행</button></td></tr>
-              <tr><td>에너지 바우처</td><td>연 24만 원</td><td>한국에너지공단</td><td><button class="f-btn-full" style="width:auto;padding:5px 12px;font-size:11px;margin:0" onclick="toast('📋 에너지 바우처 신청을 대행합니다.')">신청 대행</button></td></tr>
-            </tbody>
-          </table>
+          <div style="padding:20px;text-align:center;color:var(--txt3);font-size:12.5px">맞춤 복지 자동 탐색·신청 대행 기능은 아직 개발되지 않았습니다.</div>
         </div>
       </div>
     </div>
@@ -874,18 +823,10 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="ph">
       <div class="ph-badge">행정 기록</div>
       <div class="ph-title">나의 행정 처리 기록 (PDV)</div>
-      <div class="ph-sub">모든 기록은 OpenHash 기술로 위변조 불가하게 암호화 저장됩니다. 오직 본인만 열람합니다.</div>
+      <div class="ph-sub">실제 처리 기능이 개발되면, 기록은 OpenHash 기술로 위변조 불가하게 암호화 저장될 예정입니다. 오직 본인만 열람합니다.</div>
     </div>
     <div class="panel-body">
-      <table class="data-table">
-        <thead><tr><th>처리일</th><th>업무 유형</th><th>내용</th><th>담당 기관</th><th>상태</th></tr></thead>
-        <tbody>
-          <tr><td>2026.05.31</td><td>민원 발급</td><td>주민등록등본</td><td>정부24</td><td><span class="badge b-ok">완료</span></td></tr>
-          <tr><td>2026.05.29</td><td>시설 신고</td><td>도로 파손 (한림로 234)</td><td>제주시 도로관리과</td><td><span class="badge b-ok">완료</span></td></tr>
-          <tr><td>2026.05.20</td><td>인허가</td><td>식품 영업 허가 신청</td><td>제주시 위생과</td><td><span class="badge b-proc">심사 중</span></td></tr>
-          <tr><td>2026.05.15</td><td>민원 발급</td><td>납세증명서</td><td>국세청</td><td><span class="badge b-ok">완료</span></td></tr>
-        </tbody>
-      </table>
+      <div style="padding:30px;text-align:center;color:var(--txt3);font-size:13px">아직 실제 민원 처리 기능이 개발되지 않아 기록이 없습니다.</div>
     </div>
   </div>
 
@@ -894,40 +835,13 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none
     <div class="ph">
       <div class="ph-badge">기관</div>
       <div class="ph-title">플랫폼 통계 · 처리 현황 · OpenHash 감사</div>
-      <div class="ph-sub">K-Public 전체 민원 처리 현황과 데이터 무결성을 관리합니다.</div>
+      <div class="ph-sub">이 패널은 화면 시안입니다. 실제 집계 파이프라인이 연동되기 전까지 통계를 표시하지 않습니다.</div>
     </div>
     <div class="panel-body">
-      <div class="stat-grid" style="margin-bottom:16px">
-        <div class="stat-card"><div class="stat-val">12,847</div><div class="stat-lbl">이번 달 총 민원 처리 건</div><div class="stat-sub">전월 대비 +18.4%</div></div>
-        <div class="stat-card"><div class="stat-val">96.3%</div><div class="stat-lbl">민원 처리 완료율</div><div class="stat-sub">목표 95% 초과</div></div>
-        <div class="stat-card"><div class="stat-val">4.2시간</div><div class="stat-lbl">평균 민원 처리 시간</div><div class="stat-sub">현실 대비 89% 단축</div></div>
+      <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#92400e">
+        ⚠️ 이전 버전에는 "이번 달 총 민원 처리 12,847건", "처리 완료율 96.3%", "평균 처리시간 4.2시간(현실 대비 89% 단축)" 등과, 구체적 레코드 수까지 표시된 가짜 "OpenHash 무결성 검증" 로그가 실제 통계처럼 표시되어 있었습니다 — 전부 지어낸 예시였습니다. 실제 민원 처리 기능 자체가 아직 개발되지 않았습니다.
       </div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-hd"><span class="card-hd-t">업무 유형별 처리 현황</span></div>
-        <div class="card-bd">
-          <table class="data-table">
-            <thead><tr><th>업무 유형</th><th>건수</th><th>평균 처리 시간</th><th>완료율</th></tr></thead>
-            <tbody>
-              <tr><td>민원 서류 발급</td><td>7,241</td><td>2분</td><td>99.8%</td></tr>
-              <tr><td>공공 시설 신고</td><td>2,184</td><td>3.2일</td><td>94.1%</td></tr>
-              <tr><td>복지·지원금 신청</td><td>1,892</td><td>5.1일</td><td>91.3%</td></tr>
-              <tr><td>인허가 신청</td><td>1,530</td><td>12.4일</td><td>87.6%</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hd"><span class="card-hd-t">🔐 OpenHash 무결성 검증</span><span class="badge b-ok">정상</span></div>
-        <div class="card-bd">
-          <table class="data-table">
-            <thead><tr><th>검증 시각</th><th>레코드 수</th><th>해시 일치</th><th>이상 탐지</th><th>결과</th></tr></thead>
-            <tbody>
-              <tr><td>2026.05.31 14:00</td><td>412,891</td><td>412,891</td><td>0</td><td><span class="badge b-ok">정상</span></td></tr>
-              <tr><td>2026.05.31 08:00</td><td>412,104</td><td>412,104</td><td>0</td><td><span class="badge b-ok">정상</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <div style="padding:30px;text-align:center;color:var(--txt3);font-size:13px">집계할 실제 데이터가 없습니다.</div>
     </div>
   </div>
 
@@ -1013,7 +927,8 @@ function qs(s){show('chat',null);setTimeout(()=>{document.getElementById('chat-i
 
 function searchLocal(){
   const area=document.getElementById('local-area').value.trim();
-  toast(`🔍 ${area||'우리 동네'} 공공 정보를 공공 데이터 포털에서 조회합니다…`);
+  const sel=document.querySelector('#p-localinfo select')?.value || '공공 사업 정보';
+  qs(`${area||'우리 동네'} ${sel} 알려줘`);
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
