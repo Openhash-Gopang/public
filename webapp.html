@@ -387,6 +387,10 @@ if (_qs.get('facts')) {
 if (GWP_MODE) {
   console.info('[K-Public] GWP_FACTS 수신:', GWP_FACTS ? JSON.stringify(GWP_FACTS) : 'X (없음)');
 }
+// ★ 2026-07-30 복구 — 위치정보 패치 작업 중 실수로 이 선언을 통째로
+// 지웠던 버그. node --check(문법 검사)로는 못 잡히는 런타임 오류였다
+// (읽기 시점엔 선언이 없어 ReferenceError) — 실사용 중 발견·확인.
+let _gwpSeedUsed = false;
 
 const _sessionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
 const _sessionStartedAt = new Date().toISOString();
