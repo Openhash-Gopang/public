@@ -21,6 +21,89 @@ import { guessProvinceCode } from 'https://hondi.net/src/gopang/gov/gov-router.j
 window._guessProvinceCode = guessProvinceCode;
 </script>
 
+<!-- ── 신청서 docx 자동생성 (2026-07-30 신설) ──────────────────────
+     REQUIRED_DOCUMENTS_REGISTRY의 schema(documents + applicant_fields)와
+     실제 수집된 값을 코드가 직접 템플릿에 채운다 — LLM에게 "신청서를
+     써달라"고 요청하지 않는다. SP 문구 품질과 무관하게 항상 동일한
+     구조의 문서가 나오게 하기 위함(2026-07-30 검토 결과에 따른 설계
+     원칙 — worker.js REQUIRED_DOCUMENTS_REGISTRY 주석 참조). -->
+<script type="module">
+import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+  WidthType, AlignmentType, HeadingLevel, ShadingType }
+  from 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.mjs';
+
+function _cell(text, opts = {}) {
+  return new TableCell({
+    width: opts.width ? { size: opts.width, type: WidthType.DXA } : undefined,
+    shading: opts.header ? { type: ShadingType.CLEAR, fill: 'E8EEF7' } : undefined,
+    children: [new Paragraph({
+      alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
+      children: [new TextRun({ text: text || '', bold: !!opts.header, size: 20 })],
+    })],
+  });
+}
+function _fieldRow(label, value) {
+  return new TableRow({ children: [_cell(label, { header:true, width:2600 }), _cell(value, { width:6800 })] });
+}
+const _ACQ_LABEL = { gov24: '정부24 발급', user_authored: '본 신청서와 함께 작성', external_insurer: '제3자(보험사 등) 발급' };
+
+// schema: worker.js REQUIRED_DOCUMENTS_REGISTRY 항목 그대로(/gov/task/schema/lookup 응답).
+// caseState: <<<STATE>>>로 이미 수집된 6필드. fields: applicant_fields 수집값(id→value).
+window._buildApplicationDocx = async function(schema, caseState, fields) {
+  const applicantRows = (schema.applicant_fields || []).map(f => _fieldRow(f.label, fields[f.id]));
+  const doc = new Document({
+    sections: [{
+      properties: { page: { size: { width: 11907, height: 16840 } } }, // A4
+      children: [
+        new Paragraph({ alignment: AlignmentType.CENTER, heading: HeadingLevel.HEADING_1,
+          children: [new TextRun({ text: schema.task_name + ' 신청서', bold:true, size:32 })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing:{ after:300 },
+          children: [new TextRun({ text: `근거 법령: ${schema.legal_basis || '해당 기관 안내 참조'}`, size:18, color:'666666' })] }),
+
+        new Paragraph({ heading: HeadingLevel.HEADING_2, spacing:{ before:200, after:120 },
+          children: [new TextRun({ text: '1. 신청인 정보', bold:true, size:24 })] }),
+        new Table({ width:{ size:9400, type:WidthType.DXA }, columnWidths:[2600,6800], rows: applicantRows }),
+
+        new Paragraph({ heading: HeadingLevel.HEADING_2, spacing:{ before:300, after:120 },
+          children: [new TextRun({ text: '2. 민원 개요', bold:true, size:24 })] }),
+        new Table({ width:{ size:9400, type:WidthType.DXA }, columnWidths:[2600,6800], rows: [
+          _fieldRow('민원 목적', caseState.purpose),
+          _fieldRow('관할 지역', caseState.region),
+          _fieldRow('기한/긴급도', caseState.urgency),
+          _fieldRow('그 외 사실', caseState.extra),
+        ]}),
+
+        new Paragraph({ heading: HeadingLevel.HEADING_2, spacing:{ before:300, after:120 },
+          children: [new TextRun({ text: '3. 첨부 서류 (레지스트리 자동 대조)', bold:true, size:24 })] }),
+        new Table({ width:{ size:9400, type:WidthType.DXA }, columnWidths:[5000,3000,1400], rows: [
+          new TableRow({ children: ['서류명','구분','필수여부'].map((h,i) =>
+            _cell(h, { header:true, center:true, width:[5000,3000,1400][i] })) }),
+          ...schema.documents.map(d => new TableRow({ children: [
+            _cell(d.name, { width:5000 }),
+            _cell(_ACQ_LABEL[d.acquisition] || d.acquisition, { center:true, width:3000 }),
+            _cell(d.required ? '필수' : '선택', { center:true, width:1400 }),
+          ]})),
+        ]}),
+
+        new Paragraph({ spacing:{ before:400 }, children: [
+          new TextRun({ text: '※ "정부24 발급" 서류는 정부24 앱/웹에서 미리 발급받아 함께 제출하십시오. ', size:18 }),
+          new TextRun({ text: '"본 신청서와 함께 작성" 서류는 이 신청서와 함께 별도로 준비하십시오.', size:18 }),
+        ]}),
+        !schema.__verified ? new Paragraph({ spacing:{ before:200 }, children: [
+          new TextRun({ text: '⚠ 이 서류 목록은 아직 사람 검토 전 임시 조사 결과입니다. 정확한 요건은 관할 기관 공식 안내로 다시 확인하십시오.', size:18, color:'B02A2A', bold:true }),
+        ]}) : new Paragraph({ text: '' }),
+
+        new Paragraph({ spacing:{ before:500 }, alignment: AlignmentType.RIGHT,
+          children: [new TextRun({ text: `신청일: ${new Date().toLocaleDateString('ko-KR')}`, size:20 })] }),
+        new Paragraph({ spacing:{ before:500 }, alignment: AlignmentType.CENTER,
+          children: [new TextRun({ text: `${schema.agency_name} 귀중`, bold:true, size:24 })] }),
+      ],
+    }],
+  });
+  return await Packer.toBlob(doc);
+};
+</script>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="./assets/chat-input.css">
 <style>
@@ -658,10 +741,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 // 대화 상태
 // ══════════════════════════════════════════════════════════════
 let conversationState = {
-  phase: 'boot',            // boot → interviewing → generating → done
+  phase: 'boot',            // boot → interviewing → (registry 매칭) → [collecting_fields →] generating → done
   messages: [],              // system 메시지 없음 — 서버가 K-Public 공통+agencyPrompt로 자동 조립
   caseState: { type:'', applicant:'', purpose:'', region:'', urgency:'', extra:'' },
-  turnCount: 0
+  turnCount: 0,
+  // ★ 2026-07-30 신설 — REQUIRED_DOCUMENTS_REGISTRY 매칭 결과와 신청서
+  // 자동생성용 구조화 필드. registryMatch가 없으면(미등록 사례) 기존
+  // 자유 텍스트 안내(runGuidanceGen)로 그대로 폴백한다.
+  registryMatch: null,      // { agency, task_key } | null
+  schema: null,             // /gov/task/schema/lookup 응답의 schema
+  extendedFields: {},       // applicant_fields id → 수집된 값
+  pendingFieldIds: [],      // 아직 안 물어본 applicant_fields id 목록
 };
 let kpubUser     = null;
 let kpubNickname = '';
@@ -804,6 +894,7 @@ async function sendMessage(text, files = []) {
 
   switch (conversationState.phase) {
     case 'interviewing': await _handleInterviewTurn(fullText); break;
+    case 'collecting_fields': await _handleFieldCollectionTurn(fullText); break;
     case 'generating':
       appendBubble('ai', '안내문을 준비하는 중입니다. 잠시만 기다려 주세요.');
       break;
@@ -841,12 +932,107 @@ async function _handleInterviewTurn(text) {
     appendBubble('ai', escHtml(visible || '죄송합니다, 방금 답변이 조금 끊겼네요. 다시 한번 말씀해 주시겠어요?').replace(/\n/g,'<br>'));
 
     if (state?.ready && conversationState.turnCount >= 2) {
-      conversationState.phase = 'generating';
-      setTimeout(runGuidanceGen, 400);
+      await _onInterviewReady();
     }
   } catch(e) {
     typing.remove();
     appendBubble('ai', `⚠ ${escHtml(e.message)}`);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 2026-07-30 신설 — 인터뷰 종료(ready:true) 직후, 자유 텍스트 안내로
+// 바로 가기 전에 REQUIRED_DOCUMENTS_REGISTRY 매칭을 먼저 시도한다.
+// 매칭되면 신청서 자동생성(docx) 경로로, 안 되면(대부분 — 레지스트리가
+// 아직 2건뿐) 기존 runGuidanceGen() 자유 안내로 그대로 폴백한다 —
+// 동작 변경이 실패해도 기존 경험이 깨지지 않도록 항상 폴백을 둔다.
+// ══════════════════════════════════════════════════════════════
+function _caseSummaryText(cs) {
+  return [
+    cs.type && `민원유형: ${cs.type}`, cs.applicant && `신청인구분: ${cs.applicant}`,
+    cs.purpose && `목적: ${cs.purpose}`, cs.region && `지역: ${cs.region}`,
+    cs.extra && `추가사실: ${cs.extra}`,
+  ].filter(Boolean).join(', ');
+}
+
+async function _onInterviewReady() {
+  conversationState.phase = 'generating';
+  try {
+    const matchRes = await fetch(PROXY + '/gov/task/registry/match', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ case_summary: _caseSummaryText(conversationState.caseState) }),
+    }).then(r => r.json()).catch(() => null);
+
+    if (matchRes?.matched) {
+      const lookupRes = await fetch(PROXY + '/gov/task/schema/lookup', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guid: _govGuid(), agency: matchRes.agency, task_key: matchRes.task_key }),
+      }).then(r => r.json()).catch(() => null);
+
+      if (lookupRes?.found) {
+        conversationState.registryMatch = { agency: matchRes.agency, task_key: matchRes.task_key };
+        conversationState.schema = { ...lookupRes.schema, __verified: lookupRes.verified };
+        const known = conversationState.extendedFields;
+        conversationState.pendingFieldIds = (lookupRes.schema.applicant_fields || [])
+          .filter(f => !known[f.id]).map(f => f.id);
+
+        if (!conversationState.pendingFieldIds.length) { await _finishFieldCollectionAndGenerateDocx(); return; }
+
+        conversationState.phase = 'collecting_fields';
+        appendBubble('ai', escHtml('신청서 작성에 필요한 정보를 몇 가지 더 확인하겠습니다.').replace(/\n/g,'<br>'));
+        _askNextField();
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('[K-Public] registry 매칭 시도 실패(폴백):', e.message);
+  }
+  // 매칭 실패/미등록 — 기존 자유 텍스트 안내로 폴백
+  setTimeout(runGuidanceGen, 400);
+}
+
+function _askNextField() {
+  const id = conversationState.pendingFieldIds[0];
+  const field = (conversationState.schema.applicant_fields || []).find(f => f.id === id);
+  appendBubble('ai', escHtml(`${field ? field.label : id}을(를) 알려주시겠어요?`));
+}
+
+async function _handleFieldCollectionTurn(text) {
+  const id = conversationState.pendingFieldIds.shift();
+  if (id) conversationState.extendedFields[id] = text.trim();
+
+  if (conversationState.pendingFieldIds.length) { _askNextField(); return; }
+  await _finishFieldCollectionAndGenerateDocx();
+}
+
+async function _finishFieldCollectionAndGenerateDocx() {
+  conversationState.phase = 'generating';
+  const typing = appendTyping();
+  try {
+    const blob = await window._buildApplicationDocx(
+      conversationState.schema, conversationState.caseState, conversationState.extendedFields);
+    typing.remove();
+    const url = URL.createObjectURL(blob);
+    const fileName = `${conversationState.schema.task_name}_신청서.docx`;
+    const div = appendBubble('ai', `
+      <div class="verdict-card">
+        <div class="vc-badge">신청서 준비 완료</div>
+        <div class="vc-summary" style="font-weight:400;font-size:13.5px;line-height:1.8">
+          ${escHtml(conversationState.schema.agency_name)} — ${escHtml(conversationState.schema.task_name)} 신청서를 작성했습니다.
+          아래에서 내려받아 확인·수정 후 정부24에서 발급받은 서류와 함께 제출하십시오.
+        </div>
+        <a class="kpub-docx-download" href="${url}" download="${fileName.replace(/"/g,'')}"
+           style="display:inline-block;margin-top:10px;padding:8px 14px;background:var(--pri);color:#fff;border-radius:8px;text-decoration:none;font-size:13.5px;">
+          ${escHtml(fileName)} 다운로드
+        </a>
+      </div>
+    `);
+    conversationState.phase = 'done';
+    _reportSessionEnd(fileName, (conversationState.caseState.type || '') + ' 신청서 자동생성 완료').catch(()=>{});
+  } catch (e) {
+    typing.remove();
+    appendBubble('ai', `⚠ 신청서 생성 중 오류: ${escHtml(e.message)} — 대신 일반 안내로 진행하겠습니다.`);
+    setTimeout(runGuidanceGen, 400);
   }
 }
 
