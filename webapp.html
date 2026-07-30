@@ -847,8 +847,15 @@ function startGreeting() {
   if (GWP_CTX && !_gwpSeedUsed) {
     _gwpSeedUsed = true;
     appendBubble('user', `<i>(AI 비서로부터 전달됨)</i><br>${escHtml(GWP_CTX).replace(/\n/g,'<br>')}`);
-    appendBubble('ai', `저는 K-Public입니다. 다만 저는 실제 행정처분을 내리거나 본인 확인이 필요한 신청·신고를 대신 접수할 수 없습니다 — 정확한 접수는 안내해 드리는 공식 채널에서 진행해 주셔야 합니다.`);
-    _markGreeted();
+    // ★ 2026-07-30 버그 수정 — 이 분기만 _hasGreetedBefore() 체크 없이
+    // 매번 무조건 고지문구를 출력하고 있었다(아래 직접 접속 분기는
+    // 재방문 시 건너뛰는데, GWP 경유 분기만 그 체크가 빠져 있었음 —
+    // "삭제해도 계속 재발생"으로 보였던 현상의 실제 원인). 최초 1회만
+    // 보여주고, 재방문부터는 생략한다.
+    if (!_hasGreetedBefore()) {
+      appendBubble('ai', `저는 K-Public입니다. 다만 저는 실제 행정처분을 내리거나 본인 확인이 필요한 신청·신고를 대신 접수할 수 없습니다 — 정확한 접수는 안내해 드리는 공식 채널에서 진행해 주셔야 합니다.`);
+      _markGreeted();
+    }
     conversationState.phase = 'interviewing';
     _handleInterviewTurn(GWP_CTX);
     return;
