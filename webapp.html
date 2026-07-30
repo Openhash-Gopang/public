@@ -953,7 +953,10 @@ async function _handleInterviewTurn(text) {
 
   const typing = appendTyping();
   try {
-    const raw = await _govCall(conversationState.messages, { maxTokens: 800 });
+    // ★ 2026-07-30 버그 수정 — maxTokens:800은 STATE JSON 마커까지 포함한
+    // 응답에 너무 빡빡해서, 답변이 많이 필요한 턴(여러 단계 확인 등)에서
+    // 문장 중간에 잘리는 문제가 실사용 중 확인됐다(사용자 리포트).
+    const raw = await _govCall(conversationState.messages, { maxTokens: 1500 });
     typing.remove();
     const { visible, state } = _parseInterviewState(raw);
     conversationState.messages.push({ role:'assistant', content: raw });
@@ -1102,7 +1105,7 @@ async function runGuidanceGen() {
 방문·전화)을 통해 진행하십시오."를 반드시 포함하세요. 상태 마커는 붙이지 마세요.`;
 
   try {
-    const result = await _govCall([...conversationState.messages, { role:'user', content: genPrompt }], { maxTokens: 1200 });
+    const result = await _govCall([...conversationState.messages, { role:'user', content: genPrompt }], { maxTokens: 1800 });
     typing.remove();
     appendBubble('ai', `
       <div class="verdict-card">
@@ -1124,7 +1127,7 @@ async function _handleFreeQuestion(text) {
   conversationState.messages.push({ role:'user', content: text });
   const typing = appendTyping();
   try {
-    const resp = await _govCall(conversationState.messages, { maxTokens: 800 });
+    const resp = await _govCall(conversationState.messages, { maxTokens: 1500 });
     typing.remove();
     appendBubble('ai', escHtml(resp).replace(/\n/g,'<br>'));
     conversationState.messages.push({ role:'assistant', content: resp });
