@@ -275,6 +275,14 @@ if (_qs.get('ctx')) {
       : decodeURIComponent(_qs.get('ctx'));
   } catch(e) { GWP_CTX = ''; }
 }
+// 진단 로그 (2026-07-30 신설) — "컨텍스트가 안 넘어온다" 재현 시 gopang
+// 쪽(ctx 파라미터 생성) 문제인지 이쪽(파싱/소비) 문제인지 즉시 구분하기
+// 위한 임시 로그. GWP_MODE(gwp=1)일 때만 찍는다 — 직접 접속 시엔 원래
+// ctx가 없는 게 정상이라 노이즈만 됨.
+if (GWP_MODE) {
+  console.info('[K-Public] GWP_CTX 수신:',
+    GWP_CTX ? `O (${GWP_CTX.length}자)` : 'X (비어있음 — URL에 ctx 파라미터 자체가 없거나 빈 값)');
+}
 let _gwpSeedUsed = false;
 const _sessionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
 const _sessionStartedAt = new Date().toISOString();
@@ -733,6 +741,11 @@ async function _resolveNickname(ipv6) {
 function startGreeting() {
   if (conversationState.phase !== 'boot') return;
   const name = kpubNickname || '회원';
+  if (GWP_MODE) {
+    console.info('[K-Public] startGreeting 진입 시점 GWP_CTX:',
+      GWP_CTX ? `O (${GWP_CTX.length}자) — seed 분기로 가야 함` : 'X — 기본 인사말 분기로 감',
+      '| _gwpSeedUsed:', _gwpSeedUsed);
+  }
 
   // BUG-FIX(2026-07-03, 2차): 1차 수정은 GWP_CTX가 있으면 정적 인사+재질문을
   // 건너뛰긴 했지만 (a) "확인하고 있습니다…" 말풍선이 곧바로 이어지는 타이핑
