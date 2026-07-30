@@ -366,7 +366,28 @@ if (GWP_MODE) {
   console.info('[K-Public] GWP_CTX 수신:',
     GWP_CTX ? `O (${GWP_CTX.length}자)` : 'X (비어있음 — URL에 ctx 파라미터 자체가 없거나 빈 값)');
 }
-let _gwpSeedUsed = false;
+// ── facts(2026-07-30 신설) — 메인 비서가 이미 확보한 위치 정보 ──────
+// engine.js의 _gwpLaunch()는 _buildRoutingFacts()로 currentLocation을
+// facts/facts_enc 파라미터에 실어 보내는데, 지금까지 K-Public이 이걸
+// 전혀 읽지 않고 있었다(실사용 중 발견 — 사용자가 매번 위치를 다시
+// 질문받는 원인). "SP 문구로 묻지 말라고 지시" 방식은 이행을 강제할
+// 수 없으므로(LLM이 안 따를 수 있음), 아예 코드가 이 값을 대화 시작
+// 전에 caseState.region에 직접 채워 넣는다 — 물어볼 필요 자체를
+// 없앤다. 사용자가 나중에 다른 지역이라고 정정하면(STATE 파싱의
+// 기존 병합 규칙상) 그 값이 그대로 덮어쓴다.
+let GWP_FACTS = null;
+if (_qs.get('facts')) {
+  try {
+    const raw = (_qs.get('facts_enc') === 'b64')
+      ? decodeURIComponent(escape(atob(_qs.get('facts'))))
+      : decodeURIComponent(_qs.get('facts'));
+    GWP_FACTS = JSON.parse(raw);
+  } catch (e) { console.warn('[K-Public] facts 파싱 실패(무시):', e.message); GWP_FACTS = null; }
+}
+if (GWP_MODE) {
+  console.info('[K-Public] GWP_FACTS 수신:', GWP_FACTS ? JSON.stringify(GWP_FACTS) : 'X (없음)');
+}
+
 const _sessionId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
 const _sessionStartedAt = new Date().toISOString();
 
@@ -664,6 +685,10 @@ async function _govCallRaw(messages, opts = {}) {
     body: JSON.stringify({
       guid: _govGuid(), agency: AGENCY_ID, agencyPrompt: AGENCY_PROMPT,
       messages, max_tokens: maxTokens, stream, tier: GOV_TIER, provinceCode,
+      // ★ 2026-07-30 — 서버(handleGovRelay)가 342개 기관 전부에 공통으로
+      // 강제 주입하도록 원본 위치값을 함께 보낸다. K-Public 고유 규칙
+      // 문구에만 의존하지 않는다 — SP를 공유하는 모든 기관에 적용된다.
+      currentLocation: GWP_FACTS?.currentLocation || null,
     })
   });
 
@@ -743,7 +768,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 let conversationState = {
   phase: 'boot',            // boot → interviewing → (registry 매칭) → [collecting_fields →] generating → done
   messages: [],              // system 메시지 없음 — 서버가 K-Public 공통+agencyPrompt로 자동 조립
-  caseState: { type:'', applicant:'', purpose:'', region:'', urgency:'', extra:'' },
+  // ★ 2026-07-30 — GWP_FACTS.currentLocation이 있으면 코드가 직접
+  // region을 채워 넣는다. "SP 문구로 묻지 말라고 지시"는 이행을 강제할
+  // 수 없지만, 이 값이 이미 채워져 있으면 아래 _handleInterviewTurn의
+  // 병합 로직(state.region || 기존값)이 LLM 출력과 무관하게 항상 이
+  // 값을 지킨다 — 사용자가 명시적으로 다른 지역을 말하면 그때만 덮인다.
+  caseState: { type:'', applicant:'', purpose:'', region: GWP_FACTS?.currentLocation || '', urgency:'', extra:'' },
   turnCount: 0,
   // ★ 2026-07-30 신설 — REQUIRED_DOCUMENTS_REGISTRY 매칭 결과와 신청서
   // 자동생성용 구조화 필드. registryMatch가 없으면(미등록 사례) 기존
@@ -912,7 +942,10 @@ async function sendMessage(text, files = []) {
 async function _handleInterviewTurn(text) {
   let userContent = text;
   if (GWP_CTX && !_gwpSeedUsed) {
-    userContent = `[사용자가 사전에 "나만의 AI 비서"와 나눈 맥락 — 참고만 하고 그대로 인용하지 말 것]\n${GWP_CTX}\n\n[사용자의 이번 발화]\n${text}`;
+    const locNote = GWP_FACTS?.currentLocation
+      ? `\n\n[시스템 — 이미 확보된 정보] 사용자의 현재 위치/지역: ${GWP_FACTS.currentLocation} — 이미 확보되어 있으니 다시 묻지 마십시오. 사용자가 이후 다른 지역의 민원이라고 명시하면 그 발화를 따르십시오.`
+      : '';
+    userContent = `[사용자가 사전에 "나만의 AI 비서"와 나눈 맥락 — 참고만 하고 그대로 인용하지 말 것]\n${GWP_CTX}\n\n[사용자의 이번 발화]\n${text}${locNote}`;
     _gwpSeedUsed = true;
   }
   conversationState.messages.push({ role:'user', content: userContent });
