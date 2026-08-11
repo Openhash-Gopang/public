@@ -589,17 +589,25 @@ async function _fetchKPublicCommonClient() {
 // 동일하게 클라이언트에서 직접 fetch해 붙인다.
 const UNIVERSAL_INTEGRITY_RAW_URL = 'https://raw.githubusercontent.com/Openhash-Gopang/gopang/main/prompts/UNIVERSAL-INTEGRITY_v1_0.md';
 const UNIVERSAL_COMMON_RAW_URL    = 'https://raw.githubusercontent.com/Openhash-Gopang/gopang/main/prompts/UNIVERSAL-common_v1_1.md';
+// ★ 2026-08-09 신설 — 전수조사로 발견: 이 BYOK 경로는 UNIVERSAL-INTEGRITY·
+// UNIVERSAL-common 두 개만 개별 fetch해왔고 CONTROL-TOWER-PRINCIPLE은 한
+// 번도 포함된 적이 없었다(worker.js 쪽에서 이미 두 번 재발했던 "N군데
+// 개별 fetch가 반복되다 하나씩 빠지는" 바로 그 패턴이 여기서도 재발한
+// 것). 세 번째 fetch를 추가한다.
+const CONTROL_TOWER_PRINCIPLE_RAW_URL = 'https://raw.githubusercontent.com/Openhash-Gopang/gopang/main/prompts/CONTROL-TOWER-PRINCIPLE_v1_1.md';
 let _universalLayerClientCache = null;
 async function _fetchUniversalLayerClient() {
   if (_universalLayerClientCache !== null) return _universalLayerClientCache;
   try {
-    const [ri, rc] = await Promise.all([
+    const [ri, rc, rt] = await Promise.all([
       fetch(UNIVERSAL_INTEGRITY_RAW_URL, { cache: 'no-cache' }),
       fetch(UNIVERSAL_COMMON_RAW_URL,    { cache: 'no-cache' }),
+      fetch(CONTROL_TOWER_PRINCIPLE_RAW_URL, { cache: 'no-cache' }),
     ]);
     const parts = [];
     if (ri.ok) parts.push(await ri.text());
     if (rc.ok) parts.push(await rc.text());
+    if (rt.ok) parts.push(await rt.text());
     _universalLayerClientCache = parts.join('\n\n---\n\n');
   } catch(e) {
     console.warn('[BYOK] UNIVERSAL 레이어 로드 실패:', e.message);
