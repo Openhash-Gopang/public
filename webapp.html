@@ -10,7 +10,13 @@
 <meta name="description" content="K-Public 안내 AI와 대화를 통해 민원 유형을 파악하고 담당 기관·절차를 안내합니다.">
 
 <!-- ── 고팡 공통 인증 (subsystem-auth) ── -->
-<script type="module" src="https://hondi.net/auth/subsystem-auth.js"></script>
+<!-- K-서비스 공용 전화번호 인증 모듈(2026-09-07 부착) — 구 고팡 지갑 SSO
+     (subsystem-auth.js, 크로스 도메인 릴레이 버그로 고장난 상태였음)는
+     전수 폐기 — 이 공용 모듈 단독 체제로 전환됨. -->
+<script>
+window.K_AUTH_CONFIG = { serviceLabel: 'K-Public' };
+</script>
+<script src="https://hondi.net/auth/k-service-auth-client.js"></script>
 
 <!-- ── 지방행정 위임 시 관할 특정용 도코드 판별 (2026-07-21 신설) ──
      K-Public이 상담 중 "이건 도청/국가기관 문제"로 판단해 gov_do/
